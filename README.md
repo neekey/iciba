@@ -11,3 +11,10 @@ iciba
 - 中英文翻译（同爱词霸页面上的widget）
 - 支持英式/美式发音（爱词霸这边用了Flash等复杂的东西，由于我们是Chrome组件，因此简化了下，解析出它的mp3文件，使用html5的audio组件[howler.js](https://github.com/goldfire/howler.js)完成读音）
 
+### 使用
+
+build好的安装文件在`build`目录下，打开chrome的`工具\拓展程序`页面，将安装文件拖入页面即可。
+
+### 反馈
+
+https://github.com/neekey/iciba/issues
