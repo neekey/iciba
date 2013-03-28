@@ -15,6 +15,11 @@ iciba
 
 build好的安装文件在`build`目录下，打开chrome的`工具\拓展程序`页面，将安装文件拖入页面即可。
 
+### TODOS
+
+- 添加页面划词查找功能
+- 添加返回上一个查词记录功能
+
 ### 反馈
 
 https://github.com/neekey/iciba/issues
