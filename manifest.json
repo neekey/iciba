@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+    "name": "iciba",
+    "icons": {
+        "128": "images/logo_128.png",
+        "48": "images/logo_48.png",
+        "16": "images/logo_16.png"
+    },
+    "description": "A simple dictionary widget copy from iciba....",
+    "version": "1.0",
+    "browser_action": {
+        "default_icon": {                    // optional
+            "19": "images/logo_19.png",           // optional
+            "38": "images/logo_38.png"            // optional
+        },
+        "default_title": "iciba",      // optional; shown in tooltip
+        "default_popup": "popup.html"        // optional
+    },
+    "permissions": [
+        // 允许直接从iciba的页面中载入资源..
+        "http://*.iciba.com/*"
+    ],
+    // 允许在页面中使用eval...
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}
