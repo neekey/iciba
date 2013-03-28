@@ -1,7 +1,7 @@
 iciba
 =====
 
-从 [爱词霸](http://www.iciba.com/http://www.iciba.com/)中剥离并改造的Chrome小插件
+从 [爱词霸](http://www.iciba.com/)中剥离并改造的Chrome小插件
 
 ### 截图
 ![Screen Shot 2013-03-29 at 1 58 40 AM](https://f.cloud.github.com/assets/499870/314684/89c0a78e-97d1-11e2-81fa-a76a55bebc11.png)
