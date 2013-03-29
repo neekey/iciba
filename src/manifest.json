@@ -8,6 +8,15 @@
     },
     "description": "A simple dictionary widget copy from iciba....",
     "version": "1.0",
+    "background": {
+        "scripts": [ "jquery.js", "background.js"]
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://*/*"],
+            "js": ["content.js"]
+        }
+    ],
     "browser_action": {
         "default_icon": {                    // optional
             "19": "images/logo_19.png",           // optional
