@@ -1,46 +1,56 @@
-<!--引入爱词霸样式-->
-<link type="text/css" rel="stylesheet" href="http://open.iciba.com/huaci/mini.css"/>
-<!--引入popup样式-->
-<link rel="stylesheet" href="popup.css"/>
-<script src="jquery.js"></script>
-<!--html5 audio 组件-->
-<script src="howler.js"></script>
-<!--查询单词脚本-->
-<script src="com.js"></script>
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>iciba</title>
 
-<!--HTML结构-->
-<div id="icIBahyI-yi" style="display: none"></div>
+    <!--引入爱词霸样式-->
+    <link type="text/css" rel="stylesheet" href="http://open.iciba.com/huaci/mini.css"/>
+    <!--引入popup样式-->
+    <link rel="stylesheet" href="popup.css"/>
+    <script src="jquery.js"></script>
+    <!--html5 audio 组件-->
+    <script src="howler.js"></script>
+    <!--查询单词脚本-->
+    <script src="com.js"></script>
 
-<div id="icIBahyI-main_box">
-    <div class="icIBahyI-main_title" id="icIBahyI-main_title"> 爱词霸
-        <!--<a href="#" id="icIBahyI-gb" class="icIBahyI-gb" title="关闭"></a>-->
-        <!--<a href="#" id="icIBahyI-dq" class="icIBahyI-dq2" title="点击固定结果"></a> 爱词霸 即划即译-->
+</head>
+<body>
+    <!--HTML结构-->
+    <div id="icIBahyI-yi" style="display: none"></div>
 
-        <div class="icIBahyI-sz_list" id="icIBahyI-sz_list">
-            <!--<a href="#">关闭即划即译</a>-->
-            <a href="#" target="_blank">反馈</a>
-            <a href="#" style="border:none;" target="_blank">帮助</a>
-            <span class="icIBahyI-j icIBahyI-tl"></span>
-            <span class="icIBahyI-j icIBahyI-tr"></span>
-            <span class="icIBahyI-j icIBahyI-bl"></span>
-            <span class="icIBahyI-j icIBahyI-br"></span>
+    <div id="icIBahyI-main_box">
+        <div class="icIBahyI-main_title" id="icIBahyI-main_title"> 爱词霸
+            <!--<a href="#" id="icIBahyI-gb" class="icIBahyI-gb" title="关闭"></a>-->
+            <!--<a href="#" id="icIBahyI-dq" class="icIBahyI-dq2" title="点击固定结果"></a> 爱词霸 即划即译-->
+
+            <div class="icIBahyI-sz_list" id="icIBahyI-sz_list">
+                <!--<a href="#">关闭即划即译</a>-->
+                <a href="#" target="_blank">反馈</a>
+                <a href="#" style="border:none;" target="_blank">帮助</a>
+                <span class="icIBahyI-j icIBahyI-tl"></span>
+                <span class="icIBahyI-j icIBahyI-tr"></span>
+                <span class="icIBahyI-j icIBahyI-bl"></span>
+                <span class="icIBahyI-j icIBahyI-br"></span>
+            </div>
         </div>
-    </div>
-    <!--查询表单-->
-    <div class="icIBahyI-search">
-        <input id="ICIBA_HUAYI_input" type="text">
-        <a href="#" class="icIBahyI-sear">查 词</a>
-    </div>
+        <!--查询表单-->
+        <div class="icIBahyI-search">
+            <input id="ICIBA_HUAYI_input" type="text">
+            <a href="#" class="icIBahyI-sear">查 词</a>
+        </div>
 
-    <span class="icIBahyI-contTop"></span>
-    <div class="icIBahyI-loading" style="display: none" id="loading"></div>
-    <div class="icIBahyI-main_cont" id="icIBahyI-main_cont"></div>
-    <div class="icIBahyI-CB" id="icIBahyI-scbiframe" style="display:none"></div>
-    <div id="ICIBA_TOO_LONG" style="height:150px;display: none;" class="icIBahyI-footer">
-        您划取的内容太长，建议您去爱词霸<a href="http://fy.iciba.com">翻译</a>页面。
+        <span class="icIBahyI-contTop"></span>
+        <div class="icIBahyI-loading" style="display: none" id="loading"></div>
+        <div class="icIBahyI-main_cont" id="icIBahyI-main_cont"></div>
+        <div class="icIBahyI-CB" id="icIBahyI-scbiframe" style="display:none"></div>
+        <div id="ICIBA_TOO_LONG" style="height:150px;display: none;" class="icIBahyI-footer">
+            您划取的内容太长，建议您去爱词霸<a href="http://fy.iciba.com">翻译</a>页面。
+        </div>
+        <div class="icIBahyI-down">
+            <a href="http://ciba.iciba.com/" target="_blank">搞定邮箱/文档/pdf取词？下载词霸PC版</a>
+        </div>
+        <span class="icIBahyI-contB"></span>
     </div>
-    <div class="icIBahyI-down">
-        <a href="http://ciba.iciba.com/" target="_blank">搞定邮箱/文档/pdf取词？下载词霸PC版</a>
-    </div>
-    <span class="icIBahyI-contB"></span>
-</div>
+</body>
+</html>
