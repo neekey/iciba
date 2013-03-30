@@ -9,12 +9,17 @@
     "description": "A simple dictionary widget copy from iciba....",
     "version": "1.0",
     "background": {
-        "scripts": [ "jquery.js", "background.js"]
+        "page": "background.html"
     },
     "content_scripts": [
         {
             "matches": ["*://*/*"],
-            "js": ["content.js"]
+            "js": [
+                "jquery.js",
+                "howler.js",
+                "content/content.js",
+                "content/com.js"
+            ]
         }
     ],
     "browser_action": {
@@ -28,6 +33,11 @@
     "permissions": [
         // 允许直接从iciba的页面中载入资源..
         "http://*.iciba.com/*"
+    ],
+    "web_accessible_resources": [
+        "content/mini.css",
+        "content/bg.gif",
+        "content/loading.gif"
     ],
     // 允许在页面中使用eval...
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
