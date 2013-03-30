@@ -138,3 +138,14 @@
 #icIBahyI-main_box .icIBahyI-main_title {
     cursor: move;
 }
+#icIBahyI-main_box .icIBahyI-search input {
+    min-height: 21px;
+}
+#icIBahyI-main_box .icIBahyI-down {
+    text-align: right;
+}
+#icIBahyI-main_box .icIBahyI-down a {
+    display: inline-block;
+    margin-right: 5px;
+    border: none;
+}

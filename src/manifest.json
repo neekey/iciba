@@ -7,7 +7,7 @@
         "16": "images/logo_16.png"
     },
     "description": "A simple dictionary widget copy from iciba....",
-    "version": "1.0",
+    "version": "1.1.0",
     "background": {
         "page": "background.html"
     },
@@ -19,7 +19,7 @@
                 "howler.js",
                 "draggable.js",
                 "content/content.js",
-                "content/com_.js"
+                "content/com.js"
             ]
         }
     ],

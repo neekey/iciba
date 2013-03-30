@@ -27,7 +27,6 @@
                 });
 
                 // 初始化划词功能
-//                ICIBA_HUACI_INIT();
                 HUACI.init();
 
                 break;
