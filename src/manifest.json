@@ -17,8 +17,9 @@
             "js": [
                 "jquery.js",
                 "howler.js",
+                "draggable.js",
                 "content/content.js",
-                "content/com.js"
+                "content/com_.js"
             ]
         }
     ],

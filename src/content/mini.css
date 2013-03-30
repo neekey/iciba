@@ -135,3 +135,6 @@
 .icIBahyI-new_word {
     display: none;
 }
+#icIBahyI-main_box .icIBahyI-main_title {
+    cursor: move;
+}
