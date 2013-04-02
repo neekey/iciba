@@ -4,7 +4,7 @@ var HUACI = {
     // 是否固定搜索面板
     IF_FIXED: 0,
     // 是否允许划词
-    IF_ALLOW: 1,
+    IF_ALLOW: false,
     // 单词输入框
     wordInput: null,
     // 结果呈现区域
@@ -21,6 +21,9 @@ var HUACI = {
     closeIcon: null,
     // 固定按钮
     fixedIcon: null,
+    // 最近一次mousedown事件的event对象
+    // 用于用户点击翻译选中文字时的定位
+    latestMouseDownEvent: null,
 
     init: function(){
         this.wordInput = $( '#ICIBA_HUAYI_input' );
@@ -35,9 +38,16 @@ var HUACI = {
     },
 
     /**
+     * 切换是否启用划词
+     */
+    toggleAllowUnderline: function(){
+        this.IF_ALLOW = !this.IF_ALLOW;
+    },
+
+    /**
      * 查询单词: ICIBA_HUAYI_searchword
      */
-    searchWord: function( word ){
+    searchWord: function( word, ifShow ){
 
         word = word || this.wordInput.val();
         if( word.length > 1000 ){
@@ -58,6 +68,9 @@ var HUACI = {
             });
         }
 
+        if( ifShow ){
+            this.box.show();
+        }
     },
 
     /**
@@ -139,8 +152,9 @@ var HUACI = {
         // 拖拽
         draggable( this.box[ 0 ] );
 
-        DOC.bind( 'mousedown', function(){
+        DOC.bind( 'mousedown', function( ev ){
             HUA = 1;
+            self.latestMouseDownEvent = ev;
         });
 
         DOC.bind( 'mousemove', function(){
@@ -159,8 +173,8 @@ var HUACI = {
             var obj_left_y = obj_pos.y;
             var obj_right_x = obj_left_x + obj[0].scrollWidth;
             var obj_right_y = obj_left_y + obj[0].scrollHeight;
-            var left = mousePos.x + 30;
-            var top = mousePos.y + 30;
+            var left = mousePos.x + 20;
+            var top = mousePos.y + 10;
 
             // 允许划词，且处于划词结束，鼠标放开的状态
             if( self.IF_ALLOW && HUA >= 1 ){
@@ -210,6 +224,14 @@ var HUACI = {
                     }
                 }
             }
+            else {
+
+                // 即便是不可以启用划词的状态，若面板已经出现，点击到面板上还是不会消失
+                if( !(mousePos.x > obj_left_x && mousePos.x<obj_right_x && mousePos.y>obj_left_y && mousePos.y<obj_right_y) ){
+                    obj.hide();
+                    self.searchIcon.hide();
+                }
+            }
             HUA = 0;
         });
 
@@ -226,5 +248,31 @@ var HUACI = {
             self.searchIcon.hide();
             self.searchIcon.attr( 'data-selection', '' );
         });
+    },
+
+    /**
+     * 搜索页面上选中的文字
+     */
+    searchCurrentSelection: function(){
+
+        var obj = this.box;
+        var mousePos = this.getMouseCoords(this.latestMouseDownEvent);
+        var left = mousePos.x + 20;
+        var top = mousePos.y + 10;
+
+        // 获取用户选取文字
+        var txt = this.getSelectedTxt();
+
+        if( txt ){
+
+            obj.css({
+                left: left,
+                top: top
+            });
+
+            this.searchWord( txt );
+            obj.show();
+            this.searchIcon.hide();
+        }
     }
 };

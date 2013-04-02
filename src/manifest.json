@@ -33,7 +33,10 @@
     },
     "permissions": [
         // 允许直接从iciba的页面中载入资源..
-        "http://*.iciba.com/*"
+        "http://*.iciba.com/*",
+        // 允许添加右键菜单
+        "contextMenus",
+        "tabs"
     ],
     "web_accessible_resources": [
         "content/mini.css",
