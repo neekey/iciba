@@ -159,8 +159,8 @@ var HUACI = {
             var obj_left_y = obj_pos.y;
             var obj_right_x = obj_left_x + obj[0].scrollWidth;
             var obj_right_y = obj_left_y + obj[0].scrollHeight;
-            var left = mousePos.x+5;
-            var top = mousePos.y-30;
+            var left = mousePos.x + 30;
+            var top = mousePos.y + 30;
 
             // 允许划词，且处于划词结束，鼠标放开的状态
             if( self.IF_ALLOW && HUA >= 1 ){
@@ -205,6 +205,7 @@ var HUACI = {
 
                         if( !self.IF_FIXED ){
                             obj.hide();
+                            self.searchIcon.hide();
                         }
                     }
                 }
