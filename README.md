@@ -37,11 +37,6 @@ iciba - V1.1.0
 
 ![Screen Shot 2013-04-03 at 11 44 08 AM](https://f.cloud.github.com/assets/499870/332034/c60518d6-9c10-11e2-9423-41b54b33d65f.png)
 
-
-二、通过在页面中双击单词（或者选中单词）来取词：
-
-![Screen Shot 2013-03-31 at 3 14 27 AM](https://f.cloud.github.com/assets/499870/320831/19f242de-996e-11e2-8872-209f15b60b26.png)
-
 ### TODOS
 
 - 添加返回上一个查词记录功能
