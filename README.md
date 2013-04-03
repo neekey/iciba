@@ -1,4 +1,4 @@
-iciba - V1.1.0
+iciba - V1.2.0
 =====
 
 从 [爱词霸](http://www.iciba.com/)中剥离并改造的Chrome小插件
