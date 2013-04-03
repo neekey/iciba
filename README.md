@@ -11,7 +11,7 @@ iciba - V1.2.0
 ### 使用
 
 - 下载插件[安装包](https://github.com/neekey/iciba/blob/master/build/iciba_1.2.0.crx?raw=true)
-- 打开chrome的`工具（Tools）\拓展程序（Extensions）`页面，将安装文件拖入页面即可：
+- 打开chrome的`工具（Tools）\拓展程序（Extensions）`页面，将安装文件拖入页面即可（若拖入页面无反应，请重启Chrome）：
 
 ![Screen Shot 2013-03-31 at 8 32 54 PM](https://f.cloud.github.com/assets/499870/321683/93b9434c-99ff-11e2-84ec-81533a6f3296.png)
 
