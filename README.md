@@ -1,4 +1,4 @@
-iciba - V1.1.0
+iciba - V1.2.0
 =====
 
 从 [爱词霸](http://www.iciba.com/)中剥离并改造的Chrome小插件
@@ -11,7 +11,7 @@ iciba - V1.1.0
 ### 使用
 
 - 下载插件[安装包](https://github.com/neekey/iciba/blob/master/build/iciba_1.2.0.crx?raw=true)
-- 打开chrome的`工具（Tools）\拓展程序（Extensions）`页面，将安装文件拖入页面即可：
+- 打开chrome的`工具（Tools）\拓展程序（Extensions）`页面，将安装文件拖入页面即可（若拖入页面无反应，请重启Chrome）：
 
 ![Screen Shot 2013-03-31 at 8 32 54 PM](https://f.cloud.github.com/assets/499870/321683/93b9434c-99ff-11e2-84ec-81533a6f3296.png)
 
@@ -29,18 +29,13 @@ iciba - V1.1.0
 
 ##### （二）激活当前页面的划词翻译功能
 
-当你在浏览英文页面时，可能需要频繁地进行单词翻译，此时开启划词翻译功能，方便双击单词进行单词翻译：
+当你在浏览英文页面时，可能需要频繁地进行单词翻译，此时开启划词翻译功能，方便双击单词进行单词翻译（注意，在空白处右键，否则将选中单词，`启用划词翻译`选项将不可见）：
 
 ![Screen Shot 2013-04-03 at 11 43 30 AM](https://f.cloud.github.com/assets/499870/332033/afd76afa-9c10-11e2-890d-d35ca18374da.png)
 
 单词翻译结果截图：
 
 ![Screen Shot 2013-04-03 at 11 44 08 AM](https://f.cloud.github.com/assets/499870/332034/c60518d6-9c10-11e2-9423-41b54b33d65f.png)
-
-
-二、通过在页面中双击单词（或者选中单词）来取词：
-
-![Screen Shot 2013-03-31 at 3 14 27 AM](https://f.cloud.github.com/assets/499870/320831/19f242de-996e-11e2-8872-209f15b60b26.png)
 
 ### TODOS
 
