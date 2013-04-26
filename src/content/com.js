@@ -252,18 +252,20 @@ var HUACI = {
 
     /**
      * 搜索页面上选中的文字
+     * 这边涉及到一个页面中有多个iframe的问题，那样的情况，当使用“翻译选中单词“功能时，多个iframe中的content script
+     * 都会执行（下面这个方法执行多次），但是理论下一个页面中只有一个地方可以被选中，且有些iframe中完全没有出现过mousedown事件
+     * 因此若没有mousedown事件，和选中的文字，则直接跳过。
      */
     searchCurrentSelection: function(){
-
-        var obj = this.box;
-        var mousePos = this.getMouseCoords(this.latestMouseDownEvent);
-        var left = mousePos.x + 20;
-        var top = mousePos.y + 10;
 
         // 获取用户选取文字
         var txt = this.getSelectedTxt();
 
-        if( txt ){
+        if( this.latestMouseDownEvent && txt ){
+            var obj = this.box;
+            var mousePos = this.getMouseCoords(this.latestMouseDownEvent);
+            var left = mousePos.x + 20;
+            var top = mousePos.y + 10;
 
             obj.css({
                 left: left,

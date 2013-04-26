@@ -1,0 +1,4 @@
+/* 去掉生词本 */
+#icIBahyI-main_cont .icIBahyI-new_word a {
+    display: none;
+}

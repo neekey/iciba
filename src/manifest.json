@@ -7,7 +7,7 @@
         "16": "images/logo_16.png"
     },
     "description": "A simple dictionary widget copy from iciba....",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "background": {
         "page": "background.html"
     },
@@ -20,21 +20,20 @@
                 "draggable.js",
                 "content/content.js",
                 "content/com.js"
-            ]
+            ],
+            "all_frames": true
         }
     ],
     "browser_action": {
-        "default_icon": {                    // optional
-            "19": "images/logo_19.png",           // optional
-            "38": "images/logo_38.png"            // optional
+        "default_icon": {
+            "19": "images/logo_19.png",
+            "38": "images/logo_38.png"
         },
-        "default_title": "iciba",      // optional; shown in tooltip
-        "default_popup": "popup.html"        // optional
+        "default_title": "iciba",
+        "default_popup": "popup.html"
     },
     "permissions": [
-        // 允许直接从iciba的页面中载入资源..
         "http://*.iciba.com/*",
-        // 允许添加右键菜单
         "contextMenus",
         "tabs"
     ],
@@ -43,6 +42,5 @@
         "content/bg.gif",
         "content/loading.gif"
     ],
-    // 允许在页面中使用eval...
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
