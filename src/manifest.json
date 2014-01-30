@@ -15,11 +15,17 @@
         {
             "matches": ["*://*/*"],
             "js": [
-                "jquery.js",
-                "howler.js",
-                "draggable.js",
-                "content/content.js",
-                "content/com.js"
+                "assets/lib/jquery.js",
+                "assets/iciba.js",
+                "assets/lib/howler.js",
+                "assets/dict.js",
+                "assets/content.js"
+            ],
+            "css": [
+                "assets/iciba.css",
+                "assets/lib/font-awesome/css/font-awesome.css",
+                "assets/content.css"
+
             ],
             "all_frames": true
         }
@@ -35,12 +41,13 @@
     "permissions": [
         "http://*.iciba.com/*",
         "contextMenus",
-        "tabs"
+        "tabs",
+        "cookies",
+        "webRequest",
+        "webRequestBlocking"
     ],
     "web_accessible_resources": [
-        "content/mini.css",
-        "content/bg.gif",
-        "content/loading.gif"
+        "assets/*"
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

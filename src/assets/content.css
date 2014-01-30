@@ -1,0 +1,14 @@
+.iciba-extension-wrap {
+    position: absolute;
+    z-index: 99999;
+}
+.iciba-extension {
+    padding: 10px;
+    box-shadow: 0 0 12px #999;
+    width: 270px;
+    border-radius: 5px;
+}
+.iciba-extension .iciba-extension-header .iciba-extension-tools {
+    top: 20px;
+    right: 20px;
+}

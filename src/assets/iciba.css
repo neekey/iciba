@@ -1,0 +1,148 @@
+.iciba-extension {
+    font-size: 12px;
+    width: 250px;
+    position: relative;
+    background: white;
+}
+
+.iciba-extension .iciba-extension-header {
+    margin: 10px;
+    color: #b6b6b6;
+}
+
+.iciba-extension .iciba-extension-header .iciba-extension-tools {
+    top: 0px;
+    position: absolute;
+    right: 10px;
+}
+.iciba-extension .iciba-extension-header .iciba-extension-tools a {
+    text-decoration: none;
+    margin-left: 5px;
+    color: #999;
+}
+
+.iciba-extension .iciba-extension-search-wrap {
+    color: #666;
+    margin: 0 10px;
+}
+.iciba-extension .iciba-extension-search-wrap .iciba-extension-keyword {
+    background: #efefef;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    margin-right: 5px;
+    width: 90%;
+    outline: none;
+    color: #666;
+    border: 1px solid transparent;
+}
+
+.iciba-extension .iciba-extension-search-wrap .iciba-extension-keyword:focus {
+    border-color: #bbbbbb;
+}
+
+.iciba-extension .iciba-extension-search-wrap .iciba-extension-search {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.iciba-extension .iciba-extension-result {
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.iciba-extension .iciba-extension-result {
+    color: #666;
+    font-size: 14px;
+}
+
+.iciba-extension .iciba-extension-result.loading {
+    background: url(chrome-extension://__MSG_@@extension_id__/assets/img/loading.gif) 50% 50% no-repeat;
+    min-height: 50px;
+}
+
+.iciba-extension .iciba-extension-result.loading * {
+    display: none;
+}
+
+.iciba-extension .iciba-extension-result .icIBahyI-prons {
+    color: #333;
+    overflow: hidden;
+    font-size: 12px;
+}
+.iciba-extension .icIBahyI-prons .icIBahyI-eg {
+    line-height: 20px;
+    display: block;
+}
+.iciba-extension .icIBahyI-prons .icIBahyI-new_word {
+    float: right;
+}
+.iciba-extension .icIBahyI-simple {
+    padding-top: 10px;
+    border-top: 1px dotted #ebebeb;
+    line-height: 16px;
+    margin-top: 10px;
+}
+.iciba-extension .icIBahyI-simple p {
+    margin: 0px;
+    margin-top: 5px;
+}
+.iciba-extension .icIBahyI-footer {
+    font-size: 12px;
+    text-align: right;
+    margin-top: 20px;
+}
+.iciba-extension .iciba-extension-result .iciba-extension-pronounce {
+    cursor: pointer;
+    color: #333;
+    margin-left: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.iciba-extension .iciba-extension-result .iciba-extension-add-to-my-note {
+    color: #999;
+    cursor: pointer;
+    text-decoration: none;
+}
+.iciba-extension .iciba-extension-iciba-msg {
+    color: #666;
+    font-size: 12px;
+    box-sizing: border-box;
+    box-shadow: 0 0 12px #999;
+    border-radius: 5px;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 80%;
+    margin: 0 10%;
+    text-align: center;
+    background: white;
+}
+.iciba-extension .iciba-extension-iciba-msg .iciba-extension-close {
+    font-size: 14px;
+    font-style: normal;
+    position: absolute;
+    right: 7px;
+    top: 5px;
+    cursor: pointer;
+}
+
+
+.iciba-extension-settings {
+    overflow: hidden;
+    margin: 10px;
+    padding: 10px;
+    font-size: 12px;
+    margin-top: 20px;
+    padding-bottom: 5px;
+    border-top: 1px dotted #efefef;
+}
+.iciba-extension-settings div {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    color: #999;
+}
