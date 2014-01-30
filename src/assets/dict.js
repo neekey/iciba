@@ -9,11 +9,14 @@
         this.domKeyword = this.domIciba.find( '.J_IcibaKeyword' );
         this.domSearch = this.domIciba.find( '.J_IcibaSearch' );
         this.domResult = this.domIciba.find( '.J_IcibaResult' );
+        this.domSettings = this.domIciba.find( '.J_IcibaSettings' );
 
         this.addToBook = null;
 
         // 默认隐藏结果容器
         this.domResult.hide();
+
+        this.initSettings();
 
         // 默认聚焦搜搜狂
         setTimeout(function(){
@@ -121,10 +124,10 @@
             </div>\
             <div class="iciba-extension-result J_IcibaResult">\
             </div>\
-            <div class="iciba-extension-settings">\
-                <div class="huaci"><i class="fa fa-square-o"></i> 划词翻译</div>\
-                <div class="huaci"><i class="fa fa-check-square-o"></i> 自动发声</div>\
-                <div class="huaci"><i class="fa fa-square-o"></i> 自动添加生词本</div>\
+            <div class="iciba-extension-settings J_IcibaSettings">\
+                <div class="item J_Item" data-name="setting_huaci"><i class="fa fa-square-o"></i> 划词翻译</div>\
+                <div class="item J_Item" data-name="setting_auto-pronounce"><i class="fa fa-check-square-o"></i> 自动发声</div>\
+                <div class="item J_Item" data-name="setting_auto-add-to-my-note"><i class="fa fa-square-o"></i> 自动添加生词本</div>\
             </div>\
         </div>\
         ',
@@ -158,6 +161,49 @@
 
         hide: function(){
             this.domIciba.hide();
+        },
+
+        initSettings: function(){
+
+            var self = this;
+
+            ICIBA.getSettings(function( settings ){
+
+                self.domSettings.find( '.J_Item' )
+                    .each( function(){
+                        var item = $( this );
+                        var name = item.attr( 'data-name' );
+                        item.data( 'value', !!settings[ name ] );
+                        updateItem( item, !!settings[ name ] );
+
+                    })
+                    .bind( 'click', function(){
+                        var item = $( this );
+                        var name = item.attr( 'data-name' );
+
+                        var newValue = !item.data( 'value' );
+
+                        updateItem( item, newValue );
+
+                        item.data( 'value', newValue );
+
+                        var newSetting = {};
+                        newSetting[ name ] = newValue;
+
+                        // 保存设置
+                        ICIBA.setSettings( newSetting );
+                    });
+            });
+
+            function updateItem( item, checked ){
+
+                if( checked ){
+                    item.find( 'i' ).removeClass( 'fa-square-o').addClass( 'fa-check-square-o' );
+                }
+                else {
+                    item.find( 'i' ).removeClass( 'fa-check-square-o').addClass( 'fa-square-o' );
+                }
+            }
         },
 
         // 查询

@@ -85,6 +85,16 @@
             });
         },
 
+        getSettings: function( next ){
+            chrome.storage.local.get( [ 'setting_huaci', 'setting_auto_pronounce', 'setting_auto_add_to_my_note' ], function( items ){
+                next( items );
+            });
+        },
+
+        setSettings: function( obj, next ){
+            chrome.storage.local.set( obj, next );
+        },
+
         _getAllCookies: function( next ){
             chrome.cookies.getAll({ domain: 'iciba.com' }, function( cookies ){
                 next && next( cookies );
