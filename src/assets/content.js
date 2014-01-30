@@ -75,6 +75,8 @@
      * 划词的三个阶段 mousedown, mousemove, mouseup
      */
     $( document ).bind( 'mousedown', function( e ){
+        LAST_MOUSE_DOWN = e;
+
         // 划词的动作仅仅记录左键，表面右键的干扰
         if(e.button == 0){
             SELECTION_STAT = 1;
