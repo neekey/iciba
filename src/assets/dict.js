@@ -1,6 +1,8 @@
 ;(function( host ){
 
     var ICIBA = host.__$ICIBA;
+    var IF_AUTO_PRONOUNCE = false;
+    var IF_AUTO_ADD_TO_MY_NOTE = false;
 
     var DICT = function( container ){
 
@@ -58,32 +60,7 @@
             e.preventDefault();
             var target = $( this );
             var word = target.attr( 'wname' );
-
-            if( word ){
-                ICIBA.addToMyNote( word, function( result ){
-
-                    if( result == 1 ){
-                        self.addToBook.text( ' 添加成功' );
-                    }
-                    else if( result == 0 ){
-                        self.addToBook.text( ' 已添加过该词' );
-                    }
-                    else {
-
-                        // 检查是否是因为未登录造成的...
-                        ICIBA.ifLogin(function( login ){
-                            if( login ){
-                                self.msg( '添加失败' );
-                            }
-                            else {
-                                self.msg( '您尚未登陆，请先' +
-                                    '<a href="http://uc.iciba.com/?module=user&act=login&returnurl=http%3A%2F%2Fwww.iciba.com%2F' + word + '" target="_blank">登录</a>' +
-                                    '或<a href="http://uc.iciba.com/?module=user&act=reg&returnurl=http%3A%2F%2Fwww.iciba.com%2F' + word + '"  target="_blank">注册</a>' )
-                            }
-                        })
-                    }
-                });
-            }
+            self.addToMyNote( word );
         });
 
         // 查询按钮点击
@@ -126,8 +103,8 @@
             </div>\
             <div class="iciba-extension-settings J_IcibaSettings">\
                 <div class="item J_Item" data-name="setting_huaci"><i class="fa fa-square-o"></i> 划词翻译</div>\
-                <div class="item J_Item" data-name="setting_auto-pronounce"><i class="fa fa-check-square-o"></i> 自动发声</div>\
-                <div class="item J_Item" data-name="setting_auto-add-to-my-note"><i class="fa fa-square-o"></i> 自动添加生词本</div>\
+                <div class="item J_Item" data-name="setting_auto_pronounce"><i class="fa fa-check-square-o"></i> 自动发声</div>\
+                <div class="item J_Item" data-name="setting_auto_add_to_my_note"><i class="fa fa-square-o"></i> 自动添加生词本</div>\
             </div>\
         </div>\
         ',
@@ -163,11 +140,39 @@
             this.domIciba.hide();
         },
 
+        addToMyNote: function( word ){
+
+            var self = this;
+            if( word ){
+                ICIBA.addToMyNote( word, function( result ){
+
+                    if( result == 1 ){
+                        self.addToBook.text( ' 添加成功' );
+                    }
+                    else if( result == 0 ){
+                        self.addToBook.text( ' 已添加过该词' );
+                    }
+                    else {
+
+                        // 检查是否是因为未登录造成的...
+                        self.msg( '添加失败' );
+                        self.msg( '添加失败，您可能尚未' +
+                            '<a href="http://uc.iciba.com/?module=user&act=login&returnurl=http%3A%2F%2Fwww.iciba.com%2F' + word + '" target="_blank">登录</a>' +
+                            '或<a href="http://uc.iciba.com/?module=user&act=reg&returnurl=http%3A%2F%2Fwww.iciba.com%2F' + word + '"  target="_blank">注册</a>' )
+                    }
+                });
+            }
+        },
+
         initSettings: function(){
 
             var self = this;
 
+            // 获取用户设置，并添加监控
             ICIBA.getSettings(function( settings ){
+
+                IF_AUTO_ADD_TO_MY_NOTE = settings.setting_auto_add_to_my_note;
+                IF_AUTO_PRONOUNCE = settings.setting_auto_pronounce;
 
                 self.domSettings.find( '.J_Item' )
                     .each( function(){
@@ -193,6 +198,12 @@
                         // 保存设置
                         ICIBA.setSettings( newSetting );
                     });
+            });
+
+            // 监控划词设置项的变更
+            chrome.storage.onChanged.addListener(function callback( changes ){
+                changes.setting_auto_add_to_my_note && ( IF_AUTO_ADD_TO_MY_NOTE = changes.setting_auto_add_to_my_note.newValue );
+                changes.setting_auto_pronounce && ( IF_AUTO_PRONOUNCE = changes.setting_auto_pronounce.newValue );
             });
 
             function updateItem( item, checked ){
@@ -239,6 +250,8 @@
         // 重新设立读音 和 为生词本添加icon
         rebindProun: function(){
 
+            var audioURL = null;
+
             // 从元素的onclick属性中解析出mp3文件地址
             this.domResult.find('.icIBahyI-eg a').each(function( index, a ){
                 a = $( a );
@@ -246,13 +259,28 @@
                 a.attr( 'data-audio-url', mp3 );
                 a.removeAttr( 'onclick' );
                 a.addClass( 'fa fa-volume-up iciba-extension-pronounce' );
+
+                audioURL = mp3;
             });
 
-            // 从元素的onclick属性中解析出mp3文件地址
+            // 去掉生词本的默认事件，添加icon
             var addToBook = this.addToBook = this.domResult.find( '#CIBA_JOINWORD');
             addToBook.addClass( 'fa fa-book iciba-extension-add-to-my-note' );
             addToBook.text( ' ' + '加入生词本' );
             addToBook.removeAttr( 'onclick' );
+
+            // 若自动发音...
+            if( IF_AUTO_PRONOUNCE && audioURL ){
+                new Howl({
+                    urls: [audioURL]
+                }).play();
+            }
+
+            // 若自动添加到生词本
+            if( IF_AUTO_ADD_TO_MY_NOTE ){
+                var word = addToBook.attr( 'wname' );
+                this.addToMyNote( word );
+            }
         },
 
         setLoading: function( ifLoading ){

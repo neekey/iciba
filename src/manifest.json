@@ -38,10 +38,10 @@
         "default_popup": "popup.html"
     },
     "permissions": [
-        "http://*.iciba.com/*",
         "contextMenus",
         "tabs",
         "cookies",
+        "http://*.iciba.com/*",
         "webRequest",
         "storage"
     ],
