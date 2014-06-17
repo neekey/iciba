@@ -78,7 +78,7 @@
         LAST_MOUSE_DOWN = e;
 
         // 划词的动作仅仅记录左键，表面右键的干扰
-        if(e.button == 0){
+        if(e.button == 0 && e.shiftKey){
             SELECTION_STAT = 1;
         }
     });
