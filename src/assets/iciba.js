@@ -9,12 +9,13 @@
         /**
          * 词典查询，返回结果HTML字符串
          * @param word
+         * @param protocol
          * @param next
          */
-        search: function( word, next ){
+        search: function( word, protocol, next ){
 
             // 获取当前查询词
-            var URL = 'http://open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
+            var URL = protocol + '://open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
 
             // 将结果作为字符串返回
             $.get( URL, function( data ){
@@ -56,7 +57,7 @@
         },
 
         /**
-         * 检查用户是否已经登陆
+         * 检查用户是否已经登录
          * @param next
          */
         ifLogin: function( next ){
@@ -74,7 +75,7 @@
                         }
                         catch( e ){}
 
-                        // 是否存在用户名，是则任务登陆了
+                        // 是否存在用户名，如果是，则认为已经登录了
                         if( userInfo.e ){
                             login = true;
                         }

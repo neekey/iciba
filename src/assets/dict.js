@@ -233,7 +233,10 @@
                 this.domKeyword.val( w );
             }
 
-            ICIBA.search( word, function( result ){
+            // 获取 url 中的通信协议： http || https
+            var protocol = location.href.split(':')[0];
+
+            ICIBA.search( word, protocol, function( result ){
                 // 渲染结果
                 self.domResult.html( result );
                 self.domResult.show();
