@@ -9,12 +9,13 @@
         /**
          * 词典查询，返回结果HTML字符串
          * @param word
+         * @param protocol
          * @param next
          */
-        search: function( word, next ){
+        search: function( word, protocol, next ){
 
             // 获取当前查询词
-            var URL = 'http://open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
+            var URL = protocol + '://open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
 
             // 将结果作为字符串返回
             $.get( URL, function( data ){
@@ -35,12 +36,13 @@
         /**
          * 添加到生词本
          * @param word
+         * @param protocol
          * @param next
          * @return {Number} 1 添加成功 0 添加过 -1 添加失败
          */
-        addToMyNote: function( word, next ){
+        addToMyNote: function( word, protocol, next ){
 
-            $.get( 'http://scb.iciba.com/aiframe.php?word=' + word + '&t=' + Date.now(), function( res ){
+            $.get( protocol + '://scb.iciba.com/aiframe.php?word=' + word + '&t=' + Date.now(), function( res ){
 
                 var result = -1;
 
