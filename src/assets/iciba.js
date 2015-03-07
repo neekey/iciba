@@ -36,13 +36,12 @@
         /**
          * 添加到生词本
          * @param word
-         * @param protocol
          * @param next
          * @return {Number} 1 添加成功 0 添加过 -1 添加失败
          */
-        addToMyNote: function( word, protocol, next ){
+        addToMyNote: function( word, next ){
 
-            $.get( protocol + '://scb.iciba.com/aiframe.php?word=' + word + '&t=' + Date.now(), function( res ){
+            $.get( 'http://scb.iciba.com/aiframe.php?word=' + word + '&t=' + Date.now(), function( res ){
 
                 var result = -1;
 
@@ -58,7 +57,7 @@
         },
 
         /**
-         * 检查用户是否已经登陆
+         * 检查用户是否已经登录
          * @param next
          */
         ifLogin: function( next ){
@@ -76,7 +75,7 @@
                         }
                         catch( e ){}
 
-                        // 是否存在用户名，是则任务登陆了
+                        // 是否存在用户名，如果是，则认为已经登录了
                         if( userInfo.e ){
                             login = true;
                         }

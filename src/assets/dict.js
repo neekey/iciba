@@ -144,10 +144,7 @@
 
             var self = this;
             if( word ){
-                // 获取 url 中的通信协议： http || https
-                var protocol = location.href.split(':')[0];
-
-                ICIBA.addToMyNote( word, protocol, function( result ){
+                ICIBA.addToMyNote( word, function( result ){
 
                     if( result == 1 ){
                         self.addToBook.text( ' 添加成功' );
