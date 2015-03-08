@@ -4,6 +4,8 @@
 
 !(function( host ){
 
+    var MESSAGE_TARGET = 'ICIBA';
+
     host.__$ICIBA = {
 
         /**
@@ -13,22 +15,12 @@
          */
         search: function( word, next ){
 
-            // 获取当前查询词
-            var URL = 'http://open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
-
-            // 将结果作为字符串返回
-            $.get( URL, function( data ){
-
-                // 将单词的解释分离出来：
-                var ret = /dict.innerHTML='(.*)'/.exec( data );
-
-                if( ret && ret[1] ){
-
-                    next( ret[1].replace( /\\"/g, '"' ) );
-                }
-                else {
-                    next( '未找到 ' + word );
-                }
+            chrome.runtime.sendMessage( {
+                target: MESSAGE_TARGET,
+                type: 'search',
+                data: [ word ]
+            }, function( response ){
+                next( response.result );
             });
         },
 
@@ -40,18 +32,12 @@
          */
         addToMyNote: function( word, next ){
 
-            $.get( 'http://scb.iciba.com/aiframe.php?word=' + word + '&t=' + Date.now(), function( res ){
-
-                var result = -1;
-
-                if( res.indexOf( '添加成功' ) >= 0 ){
-                    result = 1;
-                }
-                else if( res.indexOf( '您已添加过' ) >= 0 ){
-                    result = 0;
-                }
-
-                next ( result );
+            chrome.runtime.sendMessage( {
+                target: MESSAGE_TARGET,
+                type: 'addToMyNote',
+                data: [ word ]
+            }, function( response ){
+                next( response.result );
             });
         },
 

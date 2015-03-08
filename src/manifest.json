@@ -7,7 +7,7 @@
         "16": "images/logo_16.png"
     },
     "description": "A simple dictionary widget copy from iciba....",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "background": {
         "page": "background.html"
     },
