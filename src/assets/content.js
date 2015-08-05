@@ -119,13 +119,25 @@
     });
 
     /**
+     * 不对URL等使用翻译
+     * /^((https?:\/\/)?(\w+\.)+\w+)/  URL
+     * /^\w+@(\w+\.)+\w+/  邮箱
+     */
+    var textValidate = function( text ){
+        if( text && !text.match(/^((https?:\/\/)?(\w+\.)+\w+)/) && !text.match(/^\w+@(\w+\.)+\w+/) ){
+            return true;
+        }
+        return false;
+    };
+
+    /**
      * 翻译选中的文字
      */
     var searchSelection = function(){
 
         var text = getSelectedTxt();
 
-        if( text ){
+        if( textValidate(text) ){
             var offset = getMouseCoords( LAST_MOUSE_DOWN );
             var pos = getPosition( {
                 x: offset.x,

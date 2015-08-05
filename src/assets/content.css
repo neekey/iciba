@@ -1,6 +1,7 @@
 .iciba-extension-wrap {
     position: absolute;
     z-index: 99999;
+    text-align: left;
 }
 .iciba-extension {
     padding: 10px;
