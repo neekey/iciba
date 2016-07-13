@@ -1,3 +1,7 @@
+### v2.1.1
+- merge [#35](https://github.com/neekey/iciba/pull/35), fix the problem that howler doesn't work with https.
+- update howler to 1.1.29
+
 ### v2.1.0
 - 添加對HTTPS的支持
 - 修复搜索框样式问题
