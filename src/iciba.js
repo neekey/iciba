@@ -1,5 +1,5 @@
-/* global chrome */
-import $ from 'jquery';
+/* global chrome fetch */
+import 'whatwg-fetch';
 
 let USER_INFO;
 const MESSAGE_TARGET = 'ICIBA';
@@ -10,74 +10,116 @@ const getEndPointForSearch =
 const getEndPointForAddWordToNotebook = () => `${PROTOCOL}//www.iciba.com/ajax/notebook/1`;
 const getEndPointForNotebookList = () => `${PROTOCOL}//www.iciba.com/ajax/notebooklist/1`;
 
-export const ICIBACore = {
-  search(word, next) {
-    $.get(getEndPointForSearch(word), (data) => {
-      const ret = /dict.innerHTML='(.*)'/.exec(data);
+function convertObjectToFormData(obj, formData, namespace) {
+  const fd = formData || new FormData();
 
-      if (ret && ret[1]) {
-        next(ret[1].replace(/\\"/g, '"'));
+  Object.keys(obj).forEach(property => {
+    if (obj.hasOwnProperty(property)) {
+      let formKey;
+
+      if (namespace) {
+        formKey = `${namespace}[${property}]`;
       } else {
-        next(`未找到 ${word}`);
+        formKey = property;
       }
+
+      // if the property is an object, but not a File,
+      // use recursivity.
+      if (typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
+        convertObjectToFormData(obj[property], fd, property);
+      } else {
+        // if it's a string or a File object
+        fd.append(formKey, obj[property]);
+      }
+    }
+  });
+
+  return fd;
+}
+
+export const core = {
+  search(word) {
+    return fetch(getEndPointForSearch(word), {
+      credentials: 'include',
+    })
+    .then(data => data.text())
+    .then(data => {
+      const ret = /dict.innerHTML='(.*)'/.exec(data);
+      if (ret && ret[1]) {
+        return ret[1].replace(/\\"/g, '"');
+      }
+      throw new Error(`未找到 ${word}`);
     });
   },
 
-  addToMyNote({ word, notebookName, notebookId }, next) {
-    let result = -1;
-    this.getCurrentUserInfo((user) => {
+  addToMyNote({ word, notebookName, notebookId }) {
+    return this.getCurrentUserInfo().then(user => {
       if (user) {
-        $.post(getEndPointForAddWordToNotebook(), {
-          u: user.id,
-          b: [],
-          w: JSON.stringify([{
-            ID: 1,
-            w: word,
-            p: notebookName,
-            i: notebookId,
-          }]),
-        }, (ret) => {
-          if (!ret.errno) {
-            result = 1;
+        return fetch(getEndPointForAddWordToNotebook(), {
+          credentials: 'include',
+          method: 'POST',
+          body: convertObjectToFormData({
+            u: user.id,
+            b: [],
+            w: JSON.stringify([{
+              ID: 1,
+              w: word,
+              p: notebookName,
+              i: notebookId,
+            }]),
+          }),
+        })
+        .then(ret => ret.json())
+        .then(ret => {
+          if (ret[0] && !ret[0].errno) {
+            return ret[0];
           }
-          next(result);
-        }, 'json');
-      } else {
-        next(result);
+          throw ret;
+        });
       }
+      throw new Error('need to login first');
     });
   },
 
   ifLogin(next) {
-    this.getCurrentUserInfo((user) => next(!!user));
+    return this.getCurrentUserInfo((user) => next(!!user));
   },
 
-  getSettings(next) {
-    chrome.storage.local.get(
-      ['setting_huaci', 'setting_auto_pronounce', 'setting_auto_add_to_my_note'], next);
-  },
-
-  getNotebookList(next) {
-    this.getCurrentUserInfo((user) => {
-      if (user) {
-        if (user.books) {
-          next(user.books);
-        } else {
-          $.post(getEndPointForNotebookList(), { u: user.id }, (res) => {
-            USER_INFO.books = res.books;
-            next(res.books);
-          }, 'json');
-        }
-      } else {
-        next([]);
-      }
+  getSettings() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([
+        'setting_huaci',
+        'setting_auto_pronounce',
+        'setting_auto_add_to_my_note',
+      ], resolve);
     });
   },
 
-  getCurrentUserInfo(next) {
+  getNotebookList() {
+    return this.getCurrentUserInfo().then((user) => {
+      if (user) {
+        if (user.books) {
+          return Promise.resolve(user.books);
+        }
+        return fetch(getEndPointForNotebookList(), {
+          credentials: 'include',
+          method: 'POST',
+          body: convertObjectToFormData({
+            u: user.id,
+          }),
+        }).then((res) => res.json()).then(res => {
+          USER_INFO.books = res.books;
+          return res.books;
+        });
+      }
+      return [];
+    });
+  },
+
+  getCurrentUserInfo() {
     if (typeof USER_INFO === 'undefined') {
       let user = null;
-      return this.getAllCookies((cookies) => {
+      return this.getAllCookies().then((cookies) => {
         cookies.forEach(cookie => {
           if (cookie.name === '_ustat') {
             let userInfo = {};
@@ -98,36 +140,37 @@ export const ICIBACore = {
         });
 
         USER_INFO = user;
-        next(user);
+        return user;
       });
     }
 
-    return next(USER_INFO);
+    return Promise.resolve(USER_INFO);
   },
 
-  setSettings(obj, next) {
-    chrome.storage.local.set(obj, next);
+  setSettings(obj) {
+    return new Promise((resolve) => {
+      chrome.storage.local.set(obj, resolve);
+    });
   },
 
-  getAllCookies(next) {
-    chrome.cookies.getAll({ domain: 'iciba.com' }, next);
+  getAllCookies() {
+    return new Promise((resolve) => {
+      chrome.cookies.getAll({ domain: 'iciba.com' }, resolve);
+    });
   },
 };
 
-export const ICIBA = {};
+export const iciba = {};
 
-Object.keys(ICIBACore).forEach((key) => {
-  ICIBA[key] = () => {
-    const next = arguments[arguments.length - 1];
-    const args = Array.prototype.slice.call(arguments, 0, -1);
+Object.keys(core).forEach((key) => {
+  iciba[key] = (...args) => new Promise((resolve) => {
     chrome.runtime.sendMessage({
       target: MESSAGE_TARGET,
       type: key,
-      data: args,
-    }, (response) => {
-      if (typeof next === 'function') {
-        next(response.result);
-      }
+      data: [...args],
+    }, (ret) => {
+      console.log('sendmessage ret', ret);
+      resolve(ret);
     });
-  };
+  });
 });

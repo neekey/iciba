@@ -1,4 +1,6 @@
 import React from 'react';
+import Input from 'react-toolbox/lib/input';
+import inputTheme from './theme.Input.scss';
 
 export default class SearchForm extends React.Component {
   constructor(props) {
@@ -16,30 +18,30 @@ export default class SearchForm extends React.Component {
     });
   }
 
-  handleSubmit() {
+  handleSubmit(event) {
     const value = this.state.value;
     if (value !== '') {
       this.props.onSearch(value);
       this.reset();
     }
+
+    event.preventDefault();
   }
 
-  handleInputChange(event) {
+  handleInputChange(value) {
     this.setState({
-      value: event.target.value,
+      value,
     });
   }
 
   render() {
     return (<form onSubmit={this.handleSubmit} className="iciba-extension-search-wrap">
-      <input
-        type="text"
+      <Input
+        theme={inputTheme}
         className="iciba-extension-keyword J_IcibaKeyword"
         onChange={this.handleInputChange}
+        value={this.state.value}
         placeholder="输入单词或者中文" />
-      <span
-        className="iciba-extension-search J_IcibaSearch"><i className="fa fa-search" />
-      </span>
     </form>);
   }
 }

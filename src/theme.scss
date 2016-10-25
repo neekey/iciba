@@ -1,0 +1,14 @@
+$unit: 0.625rem;
+
+$font-size: 1.4 * $unit;
+$font-size-tiny: 1.1 * $unit;
+$font-size-small: 1.2 * $unit;
+$font-size-normal: $font-size;
+$font-size-big: 1.8 * $unit;
+
+
+$input-field-font-size: $font-size-normal;
+
+$checkbox-text-font-size: $font-size-normal;
+$checkbox-size: $font-size-normal;
+$checkbox-total-height: $font-size-normal;

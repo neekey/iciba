@@ -1,2 +1,5 @@
-import { ICIBA } from './iciba';
-const iCIBAPopup = new ICIBA.DICT(document.body);
+import React from 'react';
+import ReactDOM from 'react-dom';
+import DictPanel from './cont.DictPanel';
+
+ReactDOM.render(<DictPanel />, document.getElementById('container'));

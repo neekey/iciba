@@ -1,7 +1,12 @@
 import React from 'react';
-import HTMLElement from './HTMLElement';
 
 export default class SearchResult extends React.Component {
+  constructor(props) {
+    super(props);
+    this.getRefs = this.getRefs.bind(this);
+    this.handleResultClick = this.handleResultClick.bind(this);
+  }
+
   componentDidMount() {
     this.rebindPronounce();
     this.createAddToNotebookIcon();
@@ -9,6 +14,15 @@ export default class SearchResult extends React.Component {
     // 若自动发音...
     if (this.props.autoPronounce && this.pronounceURL) {
       this.props.onPronounce(this.pronounceURL);
+    }
+  }
+
+  getRefs(container) {
+    if (container) {
+      this.container = container;
+      this.wordList = container.querySelector('.icIBahyI-label_list');
+      this.pronounceContainer = container.querySelector('.icIBahyI-prons');
+      this.addToNoteBookButton = container.querySelector('#CIBA_JOINWORD');
     }
   }
 
@@ -24,11 +38,11 @@ export default class SearchResult extends React.Component {
     let pronounceURL = null;
 
     // 从元素的onclick属性中解析出mp3文件地址
-    this.container.querySelector('.icIBahyI-eg a').forEach((a, index) => {
-      var mp3 = /(http\:.*\.mp3)/.exec(a.getAttribute('onclick'))[0];
+    this.container.querySelectorAll('.icIBahyI-eg a').forEach((a) => {
+      const mp3 = /(http:.*\.mp3)/.exec(a.getAttribute('onclick'))[0];
       a.setAttribute('data-audio-url', mp3);
       a.removeAttribute('onclick');
-      a.className += 'fa fa-volume-up iciba-extension-pronounce';
+      a.setAttribute('class', `${a.className} fa fa-volume-up iciba-extension-pronounce`);
       pronounceURL = mp3;
     });
     this.pronounceURL = pronounceURL;
@@ -37,38 +51,32 @@ export default class SearchResult extends React.Component {
   handleResultClick(event) {
     const target = event.target;
 
-    if (this.wordList.contains(target) && target.tagName === 'a') {
+    if (target === this.addToNoteBookButton) {
       event.preventDefault();
-      var keyword = target.textContent;
+      const word = target.getAttribute('wname');
+      this.props.onAddToNoteBook(word);
+    } else if (this.wordList.contains(target) && target.tagName === 'A') {
+      event.preventDefault();
+      const keyword = target.textContent;
       this.props.onSearch(keyword);
-    }
-
-    if (this.pronounceContainer.contains(target) && target.tagName === 'a') {
+    } else if (this.pronounceContainer.contains(target) && target.tagName === 'A') {
       event.preventDefault();
-      var mp3 = target.getAttribute('data-audio-url');
+      const mp3 = target.getAttribute('data-audio-url');
 
       // 调用Howl组件发音
       if (mp3) {
-        this.props.onPronounce(mp3)
+        this.props.onPronounce(mp3);
       }
     }
-
-    if (target === this.addToNoteBookButton) {
-      event.preventDefault();
-      var word = target.getAttribute('wname');
-      this.props.onAddToNoteBook(word);
-    }
-  }
-
-  getRefs(container) {
-    this.container = container;
-    this.wordList = container.querySelector('.icIBahyI-label_list');
-    this.pronounceContainer = container.querySelector('.icIBahyI-eg a');
-    this.addToNoteBookButton = container.querySelector('#CIBA_JOINWORD');
   }
 
   render() {
-    return (<HTMLElement ref={this.getRefs} onClick={this.handleResultClick} html={this.props.result}/>);
+    return (<div>
+      <div
+        dangerouslySetInnerHTML={{ __html: this.props.result }}
+        ref={this.getRefs}
+        onClick={this.handleResultClick} />
+    </div>);
   }
 }
 
@@ -79,4 +87,7 @@ SearchResult.propTypes = {
   onSearch: React.PropTypes.func,
   onPronounce: React.PropTypes.func,
   onAddToNoteBook: React.PropTypes.func,
+};
+
+SearchResult.defaultProps = {
 };

@@ -1,7 +1,7 @@
 var path = require('path');
-var webpack = require('webpack');
-var buildPath = path.resolve(__dirname, 'package/assets');
+var buildPath = path.resolve(__dirname, 'package');
 var srcPath = path.resolve(__dirname, 'src');
+var autoprefixer = require('autoprefixer');
 
 var webpackConfig = {
   entry: {
@@ -29,14 +29,20 @@ var webpackConfig = {
         },
       },
       {
-        test: /\.css$/,
-        loaders: ['style', 'css?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]'],
+        test: /\.(scss|css)$/,
+        loaders: ['style', 'css?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]', 'postcss', 'sass'],
       },
       {
         test: /\.(png|jpg|gif)$/,
         loader: 'file-loader',
       },
     ],
+  },
+  sassLoader: {
+    data: '@import "' + path.resolve(__dirname, 'src/theme.scss') + '";'
+  },
+  postcss: function () {
+    return [autoprefixer];
   },
 };
 

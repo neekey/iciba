@@ -1,0 +1,16 @@
+.container {
+  width: 20 * $unit;
+  font-size: $font-size-normal;
+}
+
+.result-container {
+  position: relative;
+}
+
+.result-container-loading {
+  height: 60px;
+}
+
+.setting-item {
+  float: left;
+}
