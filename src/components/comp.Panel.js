@@ -18,8 +18,9 @@ export default class Panel extends React.Component {
   render() {
     return (<div className={style.container}>
       <SearchForm onSearch={this.props.onSearch} />
-      <div className={this.props.isLoading ?
-        style.resultContainerLoading : style.resultContainer}>
+      <div
+        className={this.props.isLoading ?
+          style.resultContainerLoading : style.resultContainer}>
         <Loading isLoading={this.props.isLoading} />
         {this.props.result ? <SearchResult
           onSearch={this.props.onSearch}

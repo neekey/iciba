@@ -22254,7 +22254,8 @@
 	        _react2.default.createElement(_comp2.default, { onSearch: this.props.onSearch }),
 	        _react2.default.createElement(
 	          'div',
-	          { className: this.props.isLoading ? _compPanel2.default.resultContainerLoading : _compPanel2.default.resultContainer },
+	          {
+	            className: this.props.isLoading ? _compPanel2.default.resultContainerLoading : _compPanel2.default.resultContainer },
 	          _react2.default.createElement(_comp8.default, { isLoading: this.props.isLoading }),
 	          this.props.result ? _react2.default.createElement(_comp4.default, {
 	            onSearch: this.props.onSearch,
