@@ -9,6 +9,7 @@ export default class PanelContainer extends React.Component {
     this.state = {
       setting: {},
       result: '',
+      isSearching: false,
     };
 
     this.handleSettingChange = this.handleSettingChange.bind(this);
@@ -26,11 +27,14 @@ export default class PanelContainer extends React.Component {
   }
 
   handleSearch(search) {
-    console.log('search', search);
     iciba.search(search).then(ret => {
       this.setState({
         result: ret,
+        isSearching: false,
       });
+    });
+    this.setState({
+      isSearching: true,
     });
   }
 
@@ -39,7 +43,6 @@ export default class PanelContainer extends React.Component {
   }
 
   handleAddToNoteBook(word) {
-    console.log('add to note book', word);
     iciba.addToMyNote({ word }).then(ret => {
       console.log('add to note book result', ret);
     });
@@ -47,6 +50,7 @@ export default class PanelContainer extends React.Component {
 
   render() {
     return (<Panel
+      isLoading={this.state.isSearching}
       result={this.state.result}
       onSettingChange={this.handleSettingChange}
       onAddToNoteBook={this.handleAddToNoteBook}

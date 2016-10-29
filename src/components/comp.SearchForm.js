@@ -12,17 +12,10 @@ export default class SearchForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  reset() {
-    this.setState({
-      value: '',
-    });
-  }
-
   handleSubmit(event) {
     const value = this.state.value;
     if (value !== '') {
       this.props.onSearch(value);
-      this.reset();
     }
 
     event.preventDefault();

@@ -22117,7 +22117,8 @@
 	
 	    _this.state = {
 	      setting: {},
-	      result: ''
+	      result: '',
+	      isSearching: false
 	    };
 	
 	    _this.handleSettingChange = _this.handleSettingChange.bind(_this);
@@ -22141,11 +22142,14 @@
 	    value: function handleSearch(search) {
 	      var _this2 = this;
 	
-	      console.log('search', search);
 	      _iciba.iciba.search(search).then(function (ret) {
 	        _this2.setState({
-	          result: ret
+	          result: ret,
+	          isSearching: false
 	        });
+	      });
+	      this.setState({
+	        isSearching: true
 	      });
 	    }
 	  }, {
@@ -22156,7 +22160,6 @@
 	  }, {
 	    key: 'handleAddToNoteBook',
 	    value: function handleAddToNoteBook(word) {
-	      console.log('add to note book', word);
 	      _iciba.iciba.addToMyNote({ word: word }).then(function (ret) {
 	        console.log('add to note book result', ret);
 	      });
@@ -22165,6 +22168,7 @@
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(_comp2.default, {
+	        isLoading: this.state.isSearching,
 	        result: this.state.result,
 	        onSettingChange: this.handleSettingChange,
 	        onAddToNoteBook: this.handleAddToNoteBook,
@@ -22250,8 +22254,8 @@
 	        _react2.default.createElement(_comp2.default, { onSearch: this.props.onSearch }),
 	        _react2.default.createElement(
 	          'div',
-	          { className: _compPanel2.default.resultContainer },
-	          _react2.default.createElement(_comp8.default, { isLoading: false }),
+	          { className: this.props.isLoading ? _compPanel2.default.resultContainerLoading : _compPanel2.default.resultContainer },
+	          _react2.default.createElement(_comp8.default, { isLoading: this.props.isLoading }),
 	          this.props.result ? _react2.default.createElement(_comp4.default, {
 	            onSearch: this.props.onSearch,
 	            onPronounce: this.props.onPronounce,
@@ -22260,7 +22264,7 @@
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'iciba-extension-settings J_IcibaSettings' },
+	          { className: _compPanel2.default.settingContainer },
 	          _react2.default.createElement(_comp6.default, {
 	            className: _compPanel2.default.settingItem,
 	            checked: true,
@@ -22310,7 +22314,7 @@
 	  onSearch: function onSearch() {},
 	  onSettingChange: function onSettingChange() {},
 	  settings: {},
-	  result: '<div id="icIBahyI-title" \nclass="icIBahyI-title" style="display:none">hello</div>        \n<div id="icIBahyI-dict_main">            \n<div class="icIBahyI-dictbar">             \n \n <div class="icIBahyI-dict_title">                \n \n \n <div class="icIBahyI-prons">\t\t\t\t\n <span class="icIBahyI-eg">\t\t\t\t\n <span class="icIBahyI-fl">[\u82F1]\t\t\t\t\t\n <strong>[</strong>\n <strong lang="EN-US" xml:lang="EN-US">he\u02C8l\u0259u</strong><strong>]</strong>\t\t\t\t\n </span>\t\t\t\t\n <a title="\u673A\u5668\u53D1\u97F3" \n onclick="asplay_hanci(\'http://res-tts.iciba.com/5/d/4/5d41402abc4b2a76b9719d911017c592.mp3\');"  \n class="icIBahyI-ico_sound" href="javascript:;"></a>\t\t\t\t\n </span> \t\t\t\t\n <span class="icIBahyI-eg">\t\t\t\t\n <span class="icIBahyI-fl">[\u7F8E]\t\t\t\t\n <strong>[</strong>\n <strong lang="EN-US" xml:lang="EN-US">h\u025B\u02C8lo, h\u0259-</strong><strong>]</strong>\t\t\t\t\n </span>\t\t\t\t\n <a title="\u771F\u4EBA\u53D1\u97F3" \n onclick="asplay_hanci(\'http://res.iciba.com/resource/amp3/1/0/5d/41/5d41402abc4b2a76b9719d911017c592.mp3\');"  \n class="icIBahyI-ico_sound" href="javascript:;"></a>\t\t\t\t\n </span>                  \n <span class="icIBahyI-new_word">\n <a id="CIBA_JOINWORD" \n wname="hello" \n class="icIBahyI-join_word" \n href="###" hidefocus="true" onclick="iCIBA_JOINWORD();">\u751F\u8BCD\u672C</a></span> \n </div>              \n \n </div>            \n \n \n </div>            \n <div class="icIBahyI-simple">              \n <div class="icIBahyI-tab_list"></div>              \n <div class="icIBahyI-dict_content">                \n <div class="icIBahyI-group_prons">\t               \t\t\n <div class="icIBahyI-group_pos"><p>\t\t\t               \n <span class="icIBahyI-fl">int.</span>\n <span class="icIBahyI-label_list">\t\t\t\t\t              \t\t \n <label>\u54C8\u55BD\uFF0C\u5582\uFF1B</label> \t\t\t\t\t              \t\t \n <label>\u4F60\u597D\uFF0C\u60A8\u597D\uFF1B</label> \t\t\t\t\t              \t\t \n <label>\u8868\u793A\u95EE\u5019\uFF1B</label> \t\t\t\t\t              \t\t \n <label>\u6253\u62DB\u547C\uFF1B</label> </span></p><p>\t\t\t               \n <span class="icIBahyI-fl">n.</span>\n <span class="icIBahyI-label_list">\t\t\t\t\t              \t\t \n <label>\u201C\u5582\u201D\u7684\u62DB\u547C\u58F0\u6216\u95EE\u5019\u58F0\uFF1B</label> \n </span></p><p>\t\t\t               \n <span class="icIBahyI-fl">vi.</span>\n <span class="icIBahyI-label_list">\t\t\t\t\t              \t\t \n <label>\u558A\u201C\u5582\u201D\uFF1B</label> </span></p>              \n </div>              \n </div>         \n  </div>      \t\n  </div>      \t\n  </div>        \n  <div class="icIBahyI-footer">\n  <a target="_blank" href="http://www.iciba.com/hello" class="icIBahyI-xx">\u8BE6\u7EC6\u91CA\u4E49</a>\n  </div>'
+	  result: ''
 	};
 
 /***/ },
@@ -22362,19 +22366,11 @@
 	  }
 	
 	  _createClass(SearchForm, [{
-	    key: 'reset',
-	    value: function reset() {
-	      this.setState({
-	        value: ''
-	      });
-	    }
-	  }, {
 	    key: 'handleSubmit',
 	    value: function handleSubmit(event) {
 	      var value = this.state.value;
 	      if (value !== '') {
 	        this.props.onSearch(value);
-	        this.reset();
 	      }
 	
 	      event.preventDefault();
@@ -23771,6 +23767,10 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _compSearchResult = __webpack_require__(224);
+	
+	var _compSearchResult2 = _interopRequireDefault(_compSearchResult);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23795,22 +23795,18 @@
 	  _createClass(SearchResult, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      this.rebindPronounce();
-	      this.createAddToNotebookIcon();
-	
-	      // 若自动发音...
-	      if (this.props.autoPronounce && this.pronounceURL) {
-	        this.props.onPronounce(this.pronounceURL);
-	      }
+	      this.buildDOMs();
+	    }
+	  }, {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate() {
+	      this.buildDOMs();
 	    }
 	  }, {
 	    key: 'getRefs',
 	    value: function getRefs(container) {
 	      if (container) {
 	        this.container = container;
-	        this.wordList = container.querySelector('.icIBahyI-label_list');
-	        this.pronounceContainer = container.querySelector('.icIBahyI-prons');
-	        this.addToNoteBookButton = container.querySelector('#CIBA_JOINWORD');
 	      }
 	    }
 	  }, {
@@ -23821,27 +23817,70 @@
 	      this.addToNoteBookButton.innerHTML = ' 加入生词本';
 	      this.addToNoteBookButton.removeAttribute('onclick');
 	    }
+	  }, {
+	    key: 'queryDOMs',
+	    value: function queryDOMs() {
+	      var container = this.container;
+	      this.wordList = container.querySelector('.icIBahyI-label_list');
+	      this.pronounceContainer = container.querySelector('.icIBahyI-prons');
+	      this.pronounceList = container.querySelectorAll('.icIBahyI-eg');
+	      this.addToNoteBookContainer = container.querySelector('.icIBahyI-new_word');
+	      this.addToNoteBookButton = container.querySelector('#CIBA_JOINWORD');
+	      this.resultContentContainer = container.querySelector('.icIBahyI-simple');
+	      this.resultFooter = container.querySelector('.icIBahyI-footer');
+	
+	      this.pronounceContainer.className += ' ' + _compSearchResult2.default.pronounceContainer;
+	      this.pronounceList.forEach(function (item) {
+	        var pronounceItem = item;
+	        pronounceItem.className += ' ' + _compSearchResult2.default.pronounceItem;
+	      });
+	      this.addToNoteBookContainer.className += ' ' + _compSearchResult2.default.addToNoteBookContainer;
+	      this.addToNoteBookButton.className += ' ' + _compSearchResult2.default.addToNoteBookButton;
+	      this.resultContentContainer.className += ' ' + _compSearchResult2.default.resultContentContainer;
+	      this.resultFooter.className += ' ' + _compSearchResult2.default.resultFooter;
+	    }
+	  }, {
+	    key: 'buildDOMs',
+	    value: function buildDOMs() {
+	      if (this.container) {
+	        this.queryDOMs();
+	        this.rebindPronounce();
+	        this.createAddToNotebookIcon();
+	
+	        // 若自动发音...
+	        if (this.props.autoPronounce && this.pronounceURL) {
+	          this.props.onPronounce(this.pronounceURL);
+	        }
+	      }
+	    }
 	
 	    // 重新设立读音 和 为生词本添加icon
 	
 	  }, {
 	    key: 'rebindPronounce',
 	    value: function rebindPronounce() {
+	      var _this2 = this;
+	
 	      var pronounceURL = null;
 	
 	      // 从元素的onclick属性中解析出mp3文件地址
 	      this.container.querySelectorAll('.icIBahyI-eg a').forEach(function (a) {
 	        var mp3 = /(http:.*\.mp3)/.exec(a.getAttribute('onclick'))[0];
-	        a.setAttribute('data-audio-url', mp3);
-	        a.removeAttribute('onclick');
-	        a.setAttribute('class', a.className + ' fa fa-volume-up iciba-extension-pronounce');
 	        pronounceURL = mp3;
+	        _this2.pronounceList.forEach(function (item) {
+	          if (item.contains(a)) {
+	            item.setAttribute('data-audio-url', mp3);
+	          }
+	        });
+	        a.remove();
 	      });
 	      this.pronounceURL = pronounceURL;
 	    }
 	  }, {
 	    key: 'handleResultClick',
 	    value: function handleResultClick(event) {
+	      var _this3 = this;
+	
 	      var target = event.target;
 	
 	      if (target === this.addToNoteBookButton) {
@@ -23852,14 +23891,18 @@
 	        event.preventDefault();
 	        var keyword = target.textContent;
 	        this.props.onSearch(keyword);
-	      } else if (this.pronounceContainer.contains(target) && target.tagName === 'A') {
-	        event.preventDefault();
-	        var mp3 = target.getAttribute('data-audio-url');
+	      } else {
+	        this.pronounceList.forEach(function (item) {
+	          if (item === target || item.contains(target)) {
+	            event.preventDefault();
+	            var mp3 = item.getAttribute('data-audio-url');
 	
-	        // 调用Howl组件发音
-	        if (mp3) {
-	          this.props.onPronounce(mp3);
-	        }
+	            // 调用Howl组件发音
+	            if (mp3) {
+	              _this3.props.onPronounce(mp3);
+	            }
+	          }
+	        });
 	      }
 	    }
 	  }, {
@@ -23928,7 +23971,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".container-3bb2c {\n  width: 12.5rem;\n  font-size: 0.875rem; }\n\n.result-container-b4a6d {\n  position: relative; }\n\n.result-container-loading-ca321 {\n  height: 60px; }\n\n.setting-item-31e67 {\n  float: left; }\n", ""]);
+	exports.push([module.id, ".container-3bb2c {\n  width: 15.625rem;\n  font-size: 0.875rem; }\n\n.result-container-b4a6d {\n  position: relative;\n  padding: 10px 0; }\n\n.result-container-loading-ca321 {\n  position: relative;\n  height: 50px; }\n\n.setting-container-742c7 {\n  padding: 10px 0 0 0; }\n\n.setting-item-31e67 {\n  float: left; }\n", ""]);
 	
 	// exports
 	exports.locals = {
@@ -23938,6 +23981,8 @@
 		"resultContainer": "result-container-b4a6d",
 		"result-container-loading": "result-container-loading-ca321",
 		"resultContainerLoading": "result-container-loading-ca321",
+		"setting-container": "setting-container-742c7",
+		"settingContainer": "setting-container-742c7",
 		"setting-item": "setting-item-31e67",
 		"settingItem": "setting-item-31e67"
 	};
@@ -28331,6 +28376,58 @@
 	})();
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 223 */,
+/* 224 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(225);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(191)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.SearchResult.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.SearchResult.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 225 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(190)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".pronounce-container-13039 {\n  text-align: right; }\n\n.pronounce-item-6940a {\n  text-decoration: underline;\n  display: inline-block;\n  cursor: pointer;\n  color: green; }\n  .pronounce-item-6940a + .pronounce-item-6940a {\n    margin-left: 5px; }\n\n.add-to-note-book-container-8e9e6 {\n  display: block; }\n\n.result-content-container-5da10 {\n  overflow: hidden;\n  background: #eee;\n  padding: 1px 10px;\n  margin-top: 10px; }\n\n.result-footer-e9d9d {\n  text-align: right;\n  margin-top: 10px; }\n", ""]);
+	
+	// exports
+	exports.locals = {
+		"pronounce-container": "pronounce-container-13039",
+		"pronounceContainer": "pronounce-container-13039",
+		"pronounce-item": "pronounce-item-6940a",
+		"pronounceItem": "pronounce-item-6940a",
+		"add-to-note-book-container": "add-to-note-book-container-8e9e6",
+		"addToNoteBookContainer": "add-to-note-book-container-8e9e6",
+		"result-content-container": "result-content-container-5da10",
+		"resultContentContainer": "result-content-container-5da10",
+		"result-footer": "result-footer-e9d9d",
+		"resultFooter": "result-footer-e9d9d"
+	};
 
 /***/ }
 /******/ ]);
