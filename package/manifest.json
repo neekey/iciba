@@ -15,16 +15,7 @@
         {
             "matches": ["*://*/*"],
             "js": [
-                "assets/lib/jquery.js",
-                "assets/iciba.js",
-                "assets/lib/howler.js",
-                "assets/dict.js",
-                "assets/content.js"
-            ],
-            "css": [
-                "assets/iciba.css",
-                "assets/lib/font-awesome/css/font-awesome.css",
-                "assets/content.css"
+                "content.js"
             ],
             "all_frames": true
         }
@@ -46,7 +37,7 @@
         "storage"
     ],
     "web_accessible_resources": [
-        "assets/*"
+        "*"
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; media-src https:; object-src 'self'"
 }

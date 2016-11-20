@@ -1,0 +1,22 @@
+.container {
+  width: 25 * $unit;
+  font-size: $font-size-normal;
+}
+
+.result-container {
+  position: relative;
+  padding: 10px 0;
+}
+
+.result-container-loading {
+  position: relative;
+  height: 50px;
+}
+
+.setting-container {
+  padding: 10px 0 0 0;
+}
+
+.setting-item {
+  float: left;
+}
