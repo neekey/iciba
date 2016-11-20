@@ -64,212 +64,6 @@
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.iciba = exports.core = undefined;
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global chrome fetch */
-	
-	
-	__webpack_require__(2);
-	
-	var USER_INFO = void 0;
-	var MESSAGE_TARGET = 'ICIBA';
-	var PROTOCOL = document.location.protocol === 'https:' ? 'https:' : 'http:';
-	
-	var getEndPointForSearch = function getEndPointForSearch(word) {
-	  return PROTOCOL + '//open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
-	};
-	var getEndPointForAddWordToNotebook = function getEndPointForAddWordToNotebook() {
-	  return PROTOCOL + '//www.iciba.com/ajax/notebook/1';
-	};
-	var getEndPointForNotebookList = function getEndPointForNotebookList() {
-	  return PROTOCOL + '//www.iciba.com/ajax/notebooklist/1';
-	};
-	
-	function convertObjectToFormData(obj, formData, namespace) {
-	  var fd = formData || new FormData();
-	
-	  Object.keys(obj).forEach(function (property) {
-	    if (obj.hasOwnProperty(property)) {
-	      var formKey = void 0;
-	
-	      if (namespace) {
-	        formKey = namespace + '[' + property + ']';
-	      } else {
-	        formKey = property;
-	      }
-	
-	      // if the property is an object, but not a File,
-	      // use recursivity.
-	      if (_typeof(obj[property]) === 'object' && !(obj[property] instanceof File)) {
-	        convertObjectToFormData(obj[property], fd, property);
-	      } else {
-	        // if it's a string or a File object
-	        fd.append(formKey, obj[property]);
-	      }
-	    }
-	  });
-	
-	  return fd;
-	}
-	
-	var core = exports.core = {
-	  search: function search(word) {
-	    return fetch(getEndPointForSearch(word), {
-	      credentials: 'include'
-	    }).then(function (data) {
-	      return data.text();
-	    }).then(function (data) {
-	      var ret = /dict.innerHTML='(.*)'/.exec(data);
-	      if (ret && ret[1]) {
-	        return ret[1].replace(/\\"/g, '"');
-	      }
-	      throw new Error('\u672A\u627E\u5230 ' + word);
-	    });
-	  },
-	  addToMyNote: function addToMyNote(_ref) {
-	    var word = _ref.word,
-	        notebookName = _ref.notebookName,
-	        notebookId = _ref.notebookId;
-	
-	    return this.getCurrentUserInfo().then(function (user) {
-	      if (user) {
-	        return fetch(getEndPointForAddWordToNotebook(), {
-	          credentials: 'include',
-	          method: 'POST',
-	          body: convertObjectToFormData({
-	            u: user.id,
-	            b: [],
-	            w: JSON.stringify([{
-	              ID: 1,
-	              w: word,
-	              p: notebookName,
-	              i: notebookId
-	            }])
-	          })
-	        }).then(function (ret) {
-	          return ret.json();
-	        }).then(function (ret) {
-	          if (ret[0] && !ret[0].errno) {
-	            return ret[0];
-	          }
-	          throw ret;
-	        });
-	      }
-	      throw new Error('need to login first');
-	    });
-	  },
-	  ifLogin: function ifLogin(next) {
-	    return this.getCurrentUserInfo(function (user) {
-	      return next(!!user);
-	    });
-	  },
-	  getSettings: function getSettings() {
-	    return new Promise(function (resolve) {
-	      chrome.storage.local.get(['setting_huaci', 'setting_auto_pronounce', 'setting_auto_add_to_my_note'], resolve);
-	    });
-	  },
-	  getNotebookList: function getNotebookList() {
-	    return this.getCurrentUserInfo().then(function (user) {
-	      if (user) {
-	        if (user.books) {
-	          return Promise.resolve(user.books);
-	        }
-	        return fetch(getEndPointForNotebookList(), {
-	          credentials: 'include',
-	          method: 'POST',
-	          body: convertObjectToFormData({
-	            u: user.id
-	          })
-	        }).then(function (res) {
-	          return res.json();
-	        }).then(function (res) {
-	          USER_INFO.books = res.books;
-	          return res.books;
-	        });
-	      }
-	      return [];
-	    });
-	  },
-	  getCurrentUserInfo: function getCurrentUserInfo() {
-	    var _this = this;
-	
-	    if (typeof USER_INFO === 'undefined') {
-	      var _ret = function () {
-	        var user = null;
-	        return {
-	          v: _this.getAllCookies().then(function (cookies) {
-	            cookies.forEach(function (cookie) {
-	              if (cookie.name === '_ustat') {
-	                var userInfo = {};
-	                try {
-	                  userInfo = JSON.parse(decodeURIComponent(cookie.value));
-	                } catch (e) {
-	                  userInfo = {};
-	                }
-	
-	                // 是否存在用户名，是则任务登陆了
-	                if (userInfo.e) {
-	                  user = {
-	                    id: userInfo.i,
-	                    email: userInfo.e
-	                  };
-	                }
-	              }
-	            });
-	
-	            USER_INFO = user;
-	            return user;
-	          })
-	        };
-	      }();
-	
-	      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	    }
-	
-	    return Promise.resolve(USER_INFO);
-	  },
-	  setSettings: function setSettings(obj) {
-	    return new Promise(function (resolve) {
-	      chrome.storage.local.set(obj, resolve);
-	    });
-	  },
-	  getAllCookies: function getAllCookies() {
-	    return new Promise(function (resolve) {
-	      chrome.cookies.getAll({ domain: 'iciba.com' }, resolve);
-	    });
-	  }
-	};
-	
-	var iciba = exports.iciba = {};
-	
-	Object.keys(core).forEach(function (key) {
-	  iciba[key] = function () {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    return new Promise(function (resolve) {
-	      chrome.runtime.sendMessage({
-	        target: MESSAGE_TARGET,
-	        type: key,
-	        data: [].concat(args)
-	      }, function (ret) {
-	        console.log('sendmessage ret', ret);
-	        resolve(ret);
-	      });
-	    });
-	  };
-	});
-
-/***/ },
-/* 2 */
 /***/ function(module, exports) {
 
 	(function(self) {
@@ -706,6 +500,212 @@
 	  self.fetch.polyfill = true
 	})(typeof self !== 'undefined' ? self : this);
 
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.iciba = exports.core = undefined;
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global chrome fetch */
+	
+	
+	__webpack_require__(1);
+	
+	var USER_INFO = void 0;
+	var MESSAGE_TARGET = 'ICIBA';
+	var PROTOCOL = document.location.protocol === 'https:' ? 'https:' : 'http:';
+	
+	var getEndPointForSearch = function getEndPointForSearch(word) {
+	  return PROTOCOL + '//open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
+	};
+	var getEndPointForAddWordToNotebook = function getEndPointForAddWordToNotebook() {
+	  return PROTOCOL + '//www.iciba.com/ajax/notebook/1';
+	};
+	var getEndPointForNotebookList = function getEndPointForNotebookList() {
+	  return PROTOCOL + '//www.iciba.com/ajax/notebooklist/1';
+	};
+	
+	function convertObjectToFormData(obj, formData, namespace) {
+	  var fd = formData || new FormData();
+	
+	  Object.keys(obj).forEach(function (property) {
+	    if (obj.hasOwnProperty(property)) {
+	      var formKey = void 0;
+	
+	      if (namespace) {
+	        formKey = namespace + '[' + property + ']';
+	      } else {
+	        formKey = property;
+	      }
+	
+	      // if the property is an object, but not a File,
+	      // use recursivity.
+	      if (_typeof(obj[property]) === 'object' && !(obj[property] instanceof File)) {
+	        convertObjectToFormData(obj[property], fd, property);
+	      } else {
+	        // if it's a string or a File object
+	        fd.append(formKey, obj[property]);
+	      }
+	    }
+	  });
+	
+	  return fd;
+	}
+	
+	var core = exports.core = {
+	  search: function search(word) {
+	    return fetch(getEndPointForSearch(word), {
+	      credentials: 'include'
+	    }).then(function (data) {
+	      return data.text();
+	    }).then(function (data) {
+	      var ret = /dict.innerHTML='(.*)'/.exec(data);
+	      if (ret && ret[1]) {
+	        return ret[1].replace(/\\"/g, '"');
+	      }
+	      throw new Error('\u672A\u627E\u5230 ' + word);
+	    });
+	  },
+	  addToMyNote: function addToMyNote(_ref) {
+	    var word = _ref.word,
+	        notebookName = _ref.notebookName,
+	        notebookId = _ref.notebookId;
+	
+	    return this.getCurrentUserInfo().then(function (user) {
+	      if (user) {
+	        return fetch(getEndPointForAddWordToNotebook(), {
+	          credentials: 'include',
+	          method: 'POST',
+	          body: convertObjectToFormData({
+	            u: user.id,
+	            b: [],
+	            w: JSON.stringify([{
+	              ID: 1,
+	              w: word,
+	              p: notebookName,
+	              i: notebookId
+	            }])
+	          })
+	        }).then(function (ret) {
+	          return ret.json();
+	        }).then(function (ret) {
+	          if (ret[0] && !ret[0].errno) {
+	            return ret[0];
+	          }
+	          throw ret;
+	        });
+	      }
+	      throw new Error('need to login first');
+	    });
+	  },
+	  ifLogin: function ifLogin(next) {
+	    return this.getCurrentUserInfo(function (user) {
+	      return next(!!user);
+	    });
+	  },
+	  getSettings: function getSettings() {
+	    return new Promise(function (resolve) {
+	      chrome.storage.local.get(['setting_huaci', 'setting_auto_pronounce', 'setting_auto_add_to_my_note'], resolve);
+	    });
+	  },
+	  getNotebookList: function getNotebookList() {
+	    return this.getCurrentUserInfo().then(function (user) {
+	      if (user) {
+	        if (user.books) {
+	          return Promise.resolve(user.books);
+	        }
+	        return fetch(getEndPointForNotebookList(), {
+	          credentials: 'include',
+	          method: 'POST',
+	          body: convertObjectToFormData({
+	            u: user.id
+	          })
+	        }).then(function (res) {
+	          return res.json();
+	        }).then(function (res) {
+	          USER_INFO.books = res.books;
+	          return res.books;
+	        });
+	      }
+	      return [];
+	    });
+	  },
+	  getCurrentUserInfo: function getCurrentUserInfo() {
+	    var _this = this;
+	
+	    if (typeof USER_INFO === 'undefined') {
+	      var _ret = function () {
+	        var user = null;
+	        return {
+	          v: _this.getAllCookies().then(function (cookies) {
+	            cookies.forEach(function (cookie) {
+	              if (cookie.name === '_ustat') {
+	                var userInfo = {};
+	                try {
+	                  userInfo = JSON.parse(decodeURIComponent(cookie.value));
+	                } catch (e) {
+	                  userInfo = {};
+	                }
+	
+	                // 是否存在用户名，是则任务登陆了
+	                if (userInfo.e) {
+	                  user = {
+	                    id: userInfo.i,
+	                    email: userInfo.e
+	                  };
+	                }
+	              }
+	            });
+	
+	            USER_INFO = user;
+	            return user;
+	          })
+	        };
+	      }();
+	
+	      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	    }
+	
+	    return Promise.resolve(USER_INFO);
+	  },
+	  setSettings: function setSettings(obj) {
+	    return new Promise(function (resolve) {
+	      chrome.storage.local.set(obj, resolve);
+	    });
+	  },
+	  getAllCookies: function getAllCookies() {
+	    return new Promise(function (resolve) {
+	      chrome.cookies.getAll({ domain: 'iciba.com' }, resolve);
+	    });
+	  }
+	};
+	
+	var iciba = exports.iciba = {};
+	
+	Object.keys(core).forEach(function (key) {
+	  iciba[key] = function () {
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+	
+	    return new Promise(function (resolve) {
+	      chrome.runtime.sendMessage({
+	        target: MESSAGE_TARGET,
+	        type: key,
+	        data: [].concat(args)
+	      }, function (ret) {
+	        console.log('sendmessage ret', ret);
+	        resolve(ret);
+	      });
+	    });
+	  };
+	});
 
 /***/ },
 /* 3 */,
@@ -22095,9 +22095,9 @@
 	
 	var _comp2 = _interopRequireDefault(_comp);
 	
-	var _howler = __webpack_require__(222);
+	var _howler = __webpack_require__(227);
 	
-	var _iciba = __webpack_require__(1);
+	var _iciba = __webpack_require__(2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -22117,8 +22117,14 @@
 	
 	    _this.state = {
 	      setting: {},
-	      result: '',
-	      isSearching: false
+	      searchResult: '',
+	      isSearching: false,
+	      showMessage: false,
+	      message: null,
+	      isLogin: false,
+	      isAddingWordToNoteBook: false,
+	      noteBookList: [],
+	      isInitializing: true
 	    };
 	
 	    _this.handleSettingChange = _this.handleSettingChange.bind(_this);
@@ -22129,6 +22135,34 @@
 	  }
 	
 	  _createClass(PanelContainer, [{
+	    key: 'init',
+	    value: function init() {
+	      var _this2 = this;
+	
+	      this.setState({
+	        isInitializing: true
+	      });
+	
+	      _iciba.iciba.ifLogin(function (login) {
+	        if (login) {
+	          return _iciba.iciba.getSettings().then(function (settings) {
+	            return _iciba.iciba.getNotebookList().then(function (bookList) {
+	              return _this2.setState({
+	                isInitializing: false,
+	                isLogin: true,
+	                settings: settings,
+	                noteBookList: bookList
+	              });
+	            });
+	          });
+	        }
+	        return _this2.setState({
+	          isInitializing: false,
+	          isLogin: false
+	        });
+	      });
+	    }
+	  }, {
 	    key: 'handlePronounce',
 	    value: function handlePronounce(audioURL) {
 	      var sound = new _howler.Howl({
@@ -22140,11 +22174,11 @@
 	  }, {
 	    key: 'handleSearch',
 	    value: function handleSearch(search) {
-	      var _this2 = this;
+	      var _this3 = this;
 	
 	      _iciba.iciba.search(search).then(function (ret) {
-	        _this2.setState({
-	          result: ret,
+	        _this3.setState({
+	          searchResult: ret,
 	          isSearching: false
 	        });
 	      });
@@ -22161,7 +22195,7 @@
 	    key: 'handleAddToNoteBook',
 	    value: function handleAddToNoteBook(word) {
 	      _iciba.iciba.addToMyNote({ word: word }).then(function (ret) {
-	        console.log('add to note book result', ret);
+	        console.log('add to note book searchResult', ret);
 	      });
 	    }
 	  }, {
@@ -22169,7 +22203,7 @@
 	    value: function render() {
 	      return _react2.default.createElement(_comp2.default, {
 	        isLoading: this.state.isSearching,
-	        result: this.state.result,
+	        searchResult: this.state.searchResult,
 	        onSettingChange: this.handleSettingChange,
 	        onAddToNoteBook: this.handleAddToNoteBook,
 	        onSearch: this.handleSearch,
@@ -22206,17 +22240,29 @@
 	
 	var _comp4 = _interopRequireDefault(_comp3);
 	
-	var _compPanel = __webpack_require__(195);
+	var _compPanel = __webpack_require__(197);
 	
 	var _compPanel2 = _interopRequireDefault(_compPanel);
 	
-	var _comp5 = __webpack_require__(197);
+	var _comp5 = __webpack_require__(199);
 	
 	var _comp6 = _interopRequireDefault(_comp5);
 	
-	var _comp7 = __webpack_require__(213);
+	var _comp7 = __webpack_require__(215);
 	
 	var _comp8 = _interopRequireDefault(_comp7);
+	
+	var _comp9 = __webpack_require__(224);
+	
+	var _comp10 = _interopRequireDefault(_comp9);
+	
+	var _comp11 = __webpack_require__(228);
+	
+	var _comp12 = _interopRequireDefault(_comp11);
+	
+	var _comp13 = __webpack_require__(229);
+	
+	var _comp14 = _interopRequireDefault(_comp13);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -22234,7 +22280,13 @@
 	
 	    var _this = _possibleConstructorReturn(this, (Panel.__proto__ || Object.getPrototypeOf(Panel)).call(this, props));
 	
+	    _this.state = {
+	      showBookList: false,
+	      showLoginSuggest: false
+	    };
 	    _this.handleSettingChange = _this.handleSettingChange.bind(_this);
+	    _this.handleAddToNoteBookClick = _this.handleAddToNoteBookClick.bind(_this);
+	    _this.handleWordBookListClose = _this.handleWordBookListClose.bind(_this);
 	    return _this;
 	  }
 	
@@ -22242,6 +22294,33 @@
 	    key: 'handleSettingChange',
 	    value: function handleSettingChange(settingName, checked) {
 	      this.props.onSettingChange(settingName, checked);
+	    }
+	  }, {
+	    key: 'handleWordBookListClose',
+	    value: function handleWordBookListClose() {
+	      this.setState({
+	        showBookList: false
+	      });
+	    }
+	  }, {
+	    key: 'handleAddToNoteBookClick',
+	    value: function handleAddToNoteBookClick() {
+	      if (this.props.isLogin) {
+	        this.setState({
+	          showBookList: true
+	        });
+	      } else {
+	        this.setState({
+	          showLoginSuggest: true
+	        });
+	      }
+	    }
+	  }, {
+	    key: 'handleLoginSuggestClose',
+	    value: function handleLoginSuggestClose() {
+	      this.setState({
+	        showLoginSuggest: false
+	      });
 	    }
 	  }, {
 	    key: 'render',
@@ -22255,14 +22334,23 @@
 	        _react2.default.createElement(
 	          'div',
 	          {
-	            className: this.props.isLoading ? _compPanel2.default.resultContainerLoading : _compPanel2.default.resultContainer },
-	          _react2.default.createElement(_comp8.default, { isLoading: this.props.isLoading }),
-	          this.props.result ? _react2.default.createElement(_comp4.default, {
+	            className: this.props.isSearching ? _compPanel2.default.resultContainerLoading : _compPanel2.default.resultContainer },
+	          _react2.default.createElement(_comp8.default, { isLoading: this.props.isSearching }),
+	          this.props.searchResult ? _react2.default.createElement(_comp4.default, {
 	            onSearch: this.props.onSearch,
 	            onPronounce: this.props.onPronounce,
-	            onAddToNoteBook: this.props.onAddToNoteBook,
-	            result: this.props.result }) : null
+	            onAddToNoteBook: this.handleAddToNoteBookClick,
+	            result: this.props.searchResult }) : null
 	        ),
+	        _react2.default.createElement(_comp14.default, {
+	          show: this.state.showLoginSuggest,
+	          onCloseRequest: this.handleLoginSuggestClose }),
+	        _react2.default.createElement(_comp12.default, {
+	          show: this.state.showBookList,
+	          isLoading: this.props.isAddingWordToNoteBook,
+	          onCloseRequest: this.handleWordBookListClose,
+	          onBookSelect: this.props.onAddToNoteBook,
+	          books: this.props.wordBookList }),
 	        _react2.default.createElement(
 	          'div',
 	          { className: _compPanel2.default.settingContainer },
@@ -22287,7 +22375,8 @@
 	              return _this2.handleSettingChange('add_to_notebook', checked);
 	            },
 	            label: '\u81EA\u52A8\u6DFB\u52A0\u751F\u8BCD\u672C' })
-	        )
+	        ),
+	        _react2.default.createElement(_comp10.default, { show: this.props.showMessage, message: this.props.message })
 	      );
 	    }
 	  }]);
@@ -22299,14 +22388,20 @@
 	
 	
 	Panel.propTypes = {
-	  isLoading: _react2.default.PropTypes.bool,
 	  className: _react2.default.PropTypes.string,
+	  isLogin: _react2.default.PropTypes.bool,
+	  isLoading: _react2.default.PropTypes.bool,
+	  isSearching: _react2.default.PropTypes.bool,
+	  isAddingWordToNoteBook: _react2.default.PropTypes.bool,
+	  settings: _react2.default.PropTypes.object,
+	  searchResult: _react2.default.PropTypes.string,
+	  showMessage: _react2.default.PropTypes.bool,
+	  message: _react2.default.PropTypes.any,
+	  wordBookList: _react2.default.PropTypes.array,
 	  onPronounce: _react2.default.PropTypes.func,
 	  onAddToNoteBook: _react2.default.PropTypes.func,
 	  onSearch: _react2.default.PropTypes.func,
-	  onSettingChange: _react2.default.PropTypes.func,
-	  settings: _react2.default.PropTypes.object,
-	  result: _react2.default.PropTypes.string
+	  onSettingChange: _react2.default.PropTypes.func
 	};
 	
 	Panel.defaultProps = {
@@ -22315,7 +22410,7 @@
 	  onSearch: function onSearch() {},
 	  onSettingChange: function onSettingChange() {},
 	  settings: {},
-	  result: ''
+	  searchResult: ''
 	};
 
 /***/ },
@@ -23768,7 +23863,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _compSearchResult = __webpack_require__(224);
+	var _compSearchResult = __webpack_require__(195);
 	
 	var _compSearchResult2 = _interopRequireDefault(_compSearchResult);
 	
@@ -23953,6 +24048,57 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.SearchResult.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.SearchResult.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 196 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(190)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".pronounce-container-13039 {\n  text-align: right; }\n\n.pronounce-item-6940a {\n  text-decoration: underline;\n  display: inline-block;\n  cursor: pointer;\n  color: green; }\n  .pronounce-item-6940a + .pronounce-item-6940a {\n    margin-left: 5px; }\n\n.add-to-note-book-container-8e9e6 {\n  display: block; }\n\n.result-content-container-5da10 {\n  overflow: hidden;\n  background: #eee;\n  padding: 1px 10px;\n  margin-top: 10px; }\n\n.result-footer-e9d9d {\n  text-align: right;\n  margin-top: 10px; }\n", ""]);
+	
+	// exports
+	exports.locals = {
+		"pronounce-container": "pronounce-container-13039",
+		"pronounceContainer": "pronounce-container-13039",
+		"pronounce-item": "pronounce-item-6940a",
+		"pronounceItem": "pronounce-item-6940a",
+		"add-to-note-book-container": "add-to-note-book-container-8e9e6",
+		"addToNoteBookContainer": "add-to-note-book-container-8e9e6",
+		"result-content-container": "result-content-container-5da10",
+		"resultContentContainer": "result-content-container-5da10",
+		"result-footer": "result-footer-e9d9d",
+		"resultFooter": "result-footer-e9d9d"
+	};
+
+/***/ },
+/* 197 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(198);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(191)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
 			module.hot.accept("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.Panel.scss", function() {
 				var newContent = require("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.Panel.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
@@ -23964,7 +24110,7 @@
 	}
 
 /***/ },
-/* 196 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(190)();
@@ -23989,7 +24135,7 @@
 	};
 
 /***/ },
-/* 197 */
+/* 199 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24010,11 +24156,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _checkbox = __webpack_require__(198);
+	var _checkbox = __webpack_require__(200);
 	
 	var _checkbox2 = _interopRequireDefault(_checkbox);
 	
-	var _themeCheckbox = __webpack_require__(211);
+	var _themeCheckbox = __webpack_require__(213);
 	
 	var _themeCheckbox2 = _interopRequireDefault(_themeCheckbox);
 	
@@ -24025,7 +24171,7 @@
 	}
 
 /***/ },
-/* 198 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24039,17 +24185,17 @@
 	
 	var _identifiers = __webpack_require__(179);
 	
-	var _ripple = __webpack_require__(199);
+	var _ripple = __webpack_require__(201);
 	
 	var _ripple2 = _interopRequireDefault(_ripple);
 	
-	var _Checkbox = __webpack_require__(207);
+	var _Checkbox = __webpack_require__(209);
 	
-	var _Check = __webpack_require__(208);
+	var _Check = __webpack_require__(210);
 	
 	var _Check2 = _interopRequireDefault(_Check);
 	
-	var _theme = __webpack_require__(209);
+	var _theme = __webpack_require__(211);
 	
 	var _theme2 = _interopRequireDefault(_theme);
 	
@@ -24062,7 +24208,7 @@
 	exports.Checkbox = ThemedCheckbox;
 
 /***/ },
-/* 199 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24073,11 +24219,11 @@
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var _Ripple = __webpack_require__(200);
+	var _Ripple = __webpack_require__(202);
 	
 	var _Ripple2 = _interopRequireDefault(_Ripple);
 	
-	var _theme = __webpack_require__(205);
+	var _theme = __webpack_require__(207);
 	
 	var _theme2 = _interopRequireDefault(_theme);
 	
@@ -24088,7 +24234,7 @@
 	};
 
 /***/ },
-/* 200 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24113,7 +24259,7 @@
 	
 	var _classnames3 = _interopRequireDefault(_classnames2);
 	
-	var _immutabilityHelper = __webpack_require__(201);
+	var _immutabilityHelper = __webpack_require__(203);
 	
 	var _immutabilityHelper2 = _interopRequireDefault(_immutabilityHelper);
 	
@@ -24121,15 +24267,15 @@
 	
 	var _identifiers = __webpack_require__(179);
 	
-	var _events = __webpack_require__(202);
+	var _events = __webpack_require__(204);
 	
 	var _events2 = _interopRequireDefault(_events);
 	
-	var _prefixer = __webpack_require__(203);
+	var _prefixer = __webpack_require__(205);
 	
 	var _prefixer2 = _interopRequireDefault(_prefixer);
 	
-	var _utils = __webpack_require__(204);
+	var _utils = __webpack_require__(206);
 	
 	var _utils2 = _interopRequireDefault(_utils);
 	
@@ -24485,7 +24631,7 @@
 	exports.default = rippleFactory;
 
 /***/ },
-/* 201 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var invariant = __webpack_require__(184);
@@ -24660,7 +24806,7 @@
 
 
 /***/ },
-/* 202 */
+/* 204 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24734,7 +24880,7 @@
 	}
 
 /***/ },
-/* 203 */
+/* 205 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24786,7 +24932,7 @@
 	exports.default = prefixer;
 
 /***/ },
-/* 204 */
+/* 206 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24864,13 +25010,13 @@
 	};
 
 /***/ },
-/* 205 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(206);
+	var content = __webpack_require__(208);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(191)(content, {});
@@ -24890,7 +25036,7 @@
 	}
 
 /***/ },
-/* 206 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(190)();
@@ -24913,7 +25059,7 @@
 	};
 
 /***/ },
-/* 207 */
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24939,11 +25085,11 @@
 	
 	var _identifiers = __webpack_require__(179);
 	
-	var _Ripple = __webpack_require__(200);
+	var _Ripple = __webpack_require__(202);
 	
 	var _Ripple2 = _interopRequireDefault(_Ripple);
 	
-	var _Check = __webpack_require__(208);
+	var _Check = __webpack_require__(210);
 	
 	var _Check2 = _interopRequireDefault(_Check);
 	
@@ -25066,7 +25212,7 @@
 	exports.Checkbox = Checkbox;
 
 /***/ },
-/* 208 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -25123,13 +25269,13 @@
 	exports.default = factory;
 
 /***/ },
-/* 209 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(210);
+	var content = __webpack_require__(212);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(191)(content, {});
@@ -25149,7 +25295,7 @@
 	}
 
 /***/ },
-/* 210 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(190)();
@@ -25180,13 +25326,13 @@
 	};
 
 /***/ },
-/* 211 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(212);
+	var content = __webpack_require__(214);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(191)(content, {});
@@ -25206,7 +25352,7 @@
 	}
 
 /***/ },
-/* 212 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(190)();
@@ -25227,7 +25373,7 @@
 	};
 
 /***/ },
-/* 213 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -25241,15 +25387,15 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _progress_bar = __webpack_require__(214);
+	var _progress_bar = __webpack_require__(216);
 	
 	var _progress_bar2 = _interopRequireDefault(_progress_bar);
 	
-	var _compLoading = __webpack_require__(218);
+	var _compLoading = __webpack_require__(220);
 	
 	var _compLoading2 = _interopRequireDefault(_compLoading);
 	
-	var _themeProgressBar = __webpack_require__(220);
+	var _themeProgressBar = __webpack_require__(222);
 	
 	var _themeProgressBar2 = _interopRequireDefault(_themeProgressBar);
 	
@@ -25272,7 +25418,7 @@
 	};
 
 /***/ },
-/* 214 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -25286,9 +25432,9 @@
 	
 	var _identifiers = __webpack_require__(179);
 	
-	var _ProgressBar = __webpack_require__(215);
+	var _ProgressBar = __webpack_require__(217);
 	
-	var _theme = __webpack_require__(216);
+	var _theme = __webpack_require__(218);
 	
 	var _theme2 = _interopRequireDefault(_theme);
 	
@@ -25300,7 +25446,7 @@
 	exports.ProgressBar = ThemedProgressBar;
 
 /***/ },
-/* 215 */
+/* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -25324,7 +25470,7 @@
 	
 	var _identifiers = __webpack_require__(179);
 	
-	var _prefixer = __webpack_require__(203);
+	var _prefixer = __webpack_require__(205);
 	
 	var _prefixer2 = _interopRequireDefault(_prefixer);
 	
@@ -25465,13 +25611,13 @@
 	exports.ProgressBar = ProgressBar;
 
 /***/ },
-/* 216 */
+/* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(217);
+	var content = __webpack_require__(219);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(191)(content, {});
@@ -25491,7 +25637,7 @@
 	}
 
 /***/ },
-/* 217 */
+/* 219 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(190)();
@@ -25530,13 +25676,13 @@
 	};
 
 /***/ },
-/* 218 */
+/* 220 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(219);
+	var content = __webpack_require__(221);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(191)(content, {});
@@ -25556,7 +25702,7 @@
 	}
 
 /***/ },
-/* 219 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(190)();
@@ -25573,13 +25719,13 @@
 	};
 
 /***/ },
-/* 220 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(221);
+	var content = __webpack_require__(223);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(191)(content, {});
@@ -25599,7 +25745,7 @@
 	}
 
 /***/ },
-/* 221 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(190)();
@@ -25616,7 +25762,90 @@
 	};
 
 /***/ },
-/* 222 */
+/* 224 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = Message;
+	
+	var _react = __webpack_require__(4);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _compMessage = __webpack_require__(225);
+	
+	var _compMessage2 = _interopRequireDefault(_compMessage);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function Message(props) {
+	  return props.show ? _react2.default.createElement(
+	    'div',
+	    { className: _compMessage2.default.container },
+	    _react2.default.createElement(
+	      'div',
+	      { className: _compMessage2.default.message },
+	      props.message
+	    )
+	  ) : null;
+	}
+	
+	Message.propTypes = {
+	  show: _react2.default.PropTypes.bool,
+	  message: _react2.default.PropTypes.string
+	};
+
+/***/ },
+/* 225 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(226);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(191)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.Message.scss", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.Message.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 226 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(190)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".container-17701 {\n  left: 0;\n  top: 0;\n  position: fixed;\n  width: 100%;\n  height: 100%;\n  background: rgba(255, 255, 255, 0.5);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center; }\n\n.message-f07b3 {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);\n  border-radius: 5px; }\n", ""]);
+	
+	// exports
+	exports.locals = {
+		"container": "container-17701",
+		"container": "container-17701",
+		"message": "message-f07b3",
+		"message": "message-f07b3"
+	};
+
+/***/ },
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -28379,55 +28608,104 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 223 */,
-/* 224 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// style-loader: Adds some css to the DOM by adding a <style> tag
+	'use strict';
 	
-	// load the styles
-	var content = __webpack_require__(225);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(191)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.SearchResult.scss", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?importLoaders=2&module&camelCase&localIdentName=[local]-[hash:5]!./../../node_modules/postcss-loader/index.js!./../../node_modules/sass-loader/index.js!./comp.SearchResult.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = WordBookList;
+	
+	var _react = __webpack_require__(4);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function WordBookList(props) {
+	  return props.show ? _react2.default.createElement(
+	    'div',
+	    null,
+	    _react2.default.createElement(
+	      'div',
+	      { onClick: props.onCloseRequest },
+	      'X'
+	    ),
+	    _react2.default.createElement(
+	      'ul',
+	      { className: props.className },
+	      props.books.map(function (book) {
+	        return _react2.default.createElement(
+	          'li',
+	          { onClick: function onClick() {
+	              return props.onBookSelect(book);
+	            } },
+	          book.name
+	        );
+	      })
+	    )
+	  ) : null;
 	}
+	
+	WordBookList.propTypes = {
+	  className: _react2.default.PropTypes.string,
+	  books: _react2.default.PropTypes.array,
+	  onBookSelect: _react2.default.PropTypes.func,
+	  onCloseRequest: _react2.default.PropTypes.func,
+	  show: _react2.default.PropTypes.bool
+	};
+	
+	WordBookList.defaultProps = {
+	  books: [],
+	  onCloseRequest: function onCloseRequest() {}
+	};
 
 /***/ },
-/* 225 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(190)();
-	// imports
+	'use strict';
 	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = LoginSuggest;
 	
-	// module
-	exports.push([module.id, ".pronounce-container-13039 {\n  text-align: right; }\n\n.pronounce-item-6940a {\n  text-decoration: underline;\n  display: inline-block;\n  cursor: pointer;\n  color: green; }\n  .pronounce-item-6940a + .pronounce-item-6940a {\n    margin-left: 5px; }\n\n.add-to-note-book-container-8e9e6 {\n  display: block; }\n\n.result-content-container-5da10 {\n  overflow: hidden;\n  background: #eee;\n  padding: 1px 10px;\n  margin-top: 10px; }\n\n.result-footer-e9d9d {\n  text-align: right;\n  margin-top: 10px; }\n", ""]);
+	var _react = __webpack_require__(4);
 	
-	// exports
-	exports.locals = {
-		"pronounce-container": "pronounce-container-13039",
-		"pronounceContainer": "pronounce-container-13039",
-		"pronounce-item": "pronounce-item-6940a",
-		"pronounceItem": "pronounce-item-6940a",
-		"add-to-note-book-container": "add-to-note-book-container-8e9e6",
-		"addToNoteBookContainer": "add-to-note-book-container-8e9e6",
-		"result-content-container": "result-content-container-5da10",
-		"resultContentContainer": "result-content-container-5da10",
-		"result-footer": "result-footer-e9d9d",
-		"resultFooter": "result-footer-e9d9d"
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var LOGIN_URL = 'http://my.iciba.com/index.php?c=login';
+	
+	function LoginSuggest(props) {
+	  return props.show ? _react2.default.createElement(
+	    'div',
+	    null,
+	    _react2.default.createElement(
+	      'div',
+	      { onClick: props.onCloseRequest },
+	      'X'
+	    ),
+	    _react2.default.createElement(
+	      'div',
+	      null,
+	      '\u8BF7\u5148',
+	      _react2.default.createElement(
+	        'a',
+	        { href: LOGIN_URL, target: '_blank' },
+	        '\u767B\u5F55'
+	      )
+	    )
+	  ) : null;
+	}
+	
+	LoginSuggest.propTypes = {
+	  show: _react2.default.PropTypes.bool,
+	  onCloseRequest: _react2.default.PropTypes.func
 	};
 
 /***/ }

@@ -8,14 +8,45 @@ export default class PanelContainer extends React.Component {
     super(props);
     this.state = {
       setting: {},
-      result: '',
+      searchResult: '',
       isSearching: false,
+      showMessage: false,
+      message: null,
+      isLogin: false,
+      isAddingWordToNoteBook: false,
+      noteBookList: [],
+      isInitializing: true,
     };
 
     this.handleSettingChange = this.handleSettingChange.bind(this);
     this.handleAddToNoteBook = this.handleAddToNoteBook.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handlePronounce = this.handlePronounce.bind(this);
+  }
+
+  init() {
+    this.setState({
+      isInitializing: true,
+    });
+
+    iciba.ifLogin(login => {
+      if (login) {
+        return iciba.getSettings().then(settings =>
+          iciba.getNotebookList().then(bookList =>
+            this.setState({
+              isInitializing: false,
+              isLogin: true,
+              settings,
+              noteBookList: bookList,
+            })
+          )
+        );
+      }
+      return this.setState({
+        isInitializing: false,
+        isLogin: false,
+      });
+    });
   }
 
   handlePronounce(audioURL) {
@@ -29,7 +60,7 @@ export default class PanelContainer extends React.Component {
   handleSearch(search) {
     iciba.search(search).then(ret => {
       this.setState({
-        result: ret,
+        searchResult: ret,
         isSearching: false,
       });
     });
@@ -44,14 +75,14 @@ export default class PanelContainer extends React.Component {
 
   handleAddToNoteBook(word) {
     iciba.addToMyNote({ word }).then(ret => {
-      console.log('add to note book result', ret);
+      console.log('add to note book searchResult', ret);
     });
   }
 
   render() {
     return (<Panel
       isLoading={this.state.isSearching}
-      result={this.state.result}
+      searchResult={this.state.searchResult}
       onSettingChange={this.handleSettingChange}
       onAddToNoteBook={this.handleAddToNoteBook}
       onSearch={this.handleSearch}

@@ -1,4 +1,6 @@
 /* global chrome */
+/* global chrome fetch */
+import 'whatwg-fetch';
 import { core as ICIBACore } from './iciba';
 
 const SEARCH_MENU_ID = '2';
@@ -25,3 +27,9 @@ chrome.runtime.onMessage.addListener((message, sender, callback) => {
 
   return false;
 });
+
+fetch('http://www.chemistwarehouse.com.au/buy/63404/Nature-39-s-Own-Odourless-Fish-Oil-2000mg-200-Capsules', {
+  method: 'GET',
+})
+  .then(response => response.text())
+  .then(result => console.log(result));

@@ -36,6 +36,10 @@ var webpackConfig = {
         test: /\.(png|jpg|gif)$/,
         loader: 'file-loader',
       },
+      {
+        test: /\.json$/,
+        loader: 'json-loader',
+      },
     ],
   },
   sassLoader: {

@@ -50,7 +50,7 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var _iciba = __webpack_require__(1);
+	var _iciba = __webpack_require__(2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -281,212 +281,6 @@
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.iciba = exports.core = undefined;
-	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global chrome fetch */
-	
-	
-	__webpack_require__(2);
-	
-	var USER_INFO = void 0;
-	var MESSAGE_TARGET = 'ICIBA';
-	var PROTOCOL = document.location.protocol === 'https:' ? 'https:' : 'http:';
-	
-	var getEndPointForSearch = function getEndPointForSearch(word) {
-	  return PROTOCOL + '//open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
-	};
-	var getEndPointForAddWordToNotebook = function getEndPointForAddWordToNotebook() {
-	  return PROTOCOL + '//www.iciba.com/ajax/notebook/1';
-	};
-	var getEndPointForNotebookList = function getEndPointForNotebookList() {
-	  return PROTOCOL + '//www.iciba.com/ajax/notebooklist/1';
-	};
-	
-	function convertObjectToFormData(obj, formData, namespace) {
-	  var fd = formData || new FormData();
-	
-	  Object.keys(obj).forEach(function (property) {
-	    if (obj.hasOwnProperty(property)) {
-	      var formKey = void 0;
-	
-	      if (namespace) {
-	        formKey = namespace + '[' + property + ']';
-	      } else {
-	        formKey = property;
-	      }
-	
-	      // if the property is an object, but not a File,
-	      // use recursivity.
-	      if (_typeof(obj[property]) === 'object' && !(obj[property] instanceof File)) {
-	        convertObjectToFormData(obj[property], fd, property);
-	      } else {
-	        // if it's a string or a File object
-	        fd.append(formKey, obj[property]);
-	      }
-	    }
-	  });
-	
-	  return fd;
-	}
-	
-	var core = exports.core = {
-	  search: function search(word) {
-	    return fetch(getEndPointForSearch(word), {
-	      credentials: 'include'
-	    }).then(function (data) {
-	      return data.text();
-	    }).then(function (data) {
-	      var ret = /dict.innerHTML='(.*)'/.exec(data);
-	      if (ret && ret[1]) {
-	        return ret[1].replace(/\\"/g, '"');
-	      }
-	      throw new Error('\u672A\u627E\u5230 ' + word);
-	    });
-	  },
-	  addToMyNote: function addToMyNote(_ref) {
-	    var word = _ref.word,
-	        notebookName = _ref.notebookName,
-	        notebookId = _ref.notebookId;
-	
-	    return this.getCurrentUserInfo().then(function (user) {
-	      if (user) {
-	        return fetch(getEndPointForAddWordToNotebook(), {
-	          credentials: 'include',
-	          method: 'POST',
-	          body: convertObjectToFormData({
-	            u: user.id,
-	            b: [],
-	            w: JSON.stringify([{
-	              ID: 1,
-	              w: word,
-	              p: notebookName,
-	              i: notebookId
-	            }])
-	          })
-	        }).then(function (ret) {
-	          return ret.json();
-	        }).then(function (ret) {
-	          if (ret[0] && !ret[0].errno) {
-	            return ret[0];
-	          }
-	          throw ret;
-	        });
-	      }
-	      throw new Error('need to login first');
-	    });
-	  },
-	  ifLogin: function ifLogin(next) {
-	    return this.getCurrentUserInfo(function (user) {
-	      return next(!!user);
-	    });
-	  },
-	  getSettings: function getSettings() {
-	    return new Promise(function (resolve) {
-	      chrome.storage.local.get(['setting_huaci', 'setting_auto_pronounce', 'setting_auto_add_to_my_note'], resolve);
-	    });
-	  },
-	  getNotebookList: function getNotebookList() {
-	    return this.getCurrentUserInfo().then(function (user) {
-	      if (user) {
-	        if (user.books) {
-	          return Promise.resolve(user.books);
-	        }
-	        return fetch(getEndPointForNotebookList(), {
-	          credentials: 'include',
-	          method: 'POST',
-	          body: convertObjectToFormData({
-	            u: user.id
-	          })
-	        }).then(function (res) {
-	          return res.json();
-	        }).then(function (res) {
-	          USER_INFO.books = res.books;
-	          return res.books;
-	        });
-	      }
-	      return [];
-	    });
-	  },
-	  getCurrentUserInfo: function getCurrentUserInfo() {
-	    var _this = this;
-	
-	    if (typeof USER_INFO === 'undefined') {
-	      var _ret = function () {
-	        var user = null;
-	        return {
-	          v: _this.getAllCookies().then(function (cookies) {
-	            cookies.forEach(function (cookie) {
-	              if (cookie.name === '_ustat') {
-	                var userInfo = {};
-	                try {
-	                  userInfo = JSON.parse(decodeURIComponent(cookie.value));
-	                } catch (e) {
-	                  userInfo = {};
-	                }
-	
-	                // 是否存在用户名，是则任务登陆了
-	                if (userInfo.e) {
-	                  user = {
-	                    id: userInfo.i,
-	                    email: userInfo.e
-	                  };
-	                }
-	              }
-	            });
-	
-	            USER_INFO = user;
-	            return user;
-	          })
-	        };
-	      }();
-	
-	      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	    }
-	
-	    return Promise.resolve(USER_INFO);
-	  },
-	  setSettings: function setSettings(obj) {
-	    return new Promise(function (resolve) {
-	      chrome.storage.local.set(obj, resolve);
-	    });
-	  },
-	  getAllCookies: function getAllCookies() {
-	    return new Promise(function (resolve) {
-	      chrome.cookies.getAll({ domain: 'iciba.com' }, resolve);
-	    });
-	  }
-	};
-	
-	var iciba = exports.iciba = {};
-	
-	Object.keys(core).forEach(function (key) {
-	  iciba[key] = function () {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    return new Promise(function (resolve) {
-	      chrome.runtime.sendMessage({
-	        target: MESSAGE_TARGET,
-	        type: key,
-	        data: [].concat(args)
-	      }, function (ret) {
-	        console.log('sendmessage ret', ret);
-	        resolve(ret);
-	      });
-	    });
-	  };
-	});
-
-/***/ },
-/* 2 */
 /***/ function(module, exports) {
 
 	(function(self) {
@@ -923,6 +717,212 @@
 	  self.fetch.polyfill = true
 	})(typeof self !== 'undefined' ? self : this);
 
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.iciba = exports.core = undefined;
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* global chrome fetch */
+	
+	
+	__webpack_require__(1);
+	
+	var USER_INFO = void 0;
+	var MESSAGE_TARGET = 'ICIBA';
+	var PROTOCOL = document.location.protocol === 'https:' ? 'https:' : 'http:';
+	
+	var getEndPointForSearch = function getEndPointForSearch(word) {
+	  return PROTOCOL + '//open.iciba.com/huaci/dict.php?word=' + encodeURIComponent(word);
+	};
+	var getEndPointForAddWordToNotebook = function getEndPointForAddWordToNotebook() {
+	  return PROTOCOL + '//www.iciba.com/ajax/notebook/1';
+	};
+	var getEndPointForNotebookList = function getEndPointForNotebookList() {
+	  return PROTOCOL + '//www.iciba.com/ajax/notebooklist/1';
+	};
+	
+	function convertObjectToFormData(obj, formData, namespace) {
+	  var fd = formData || new FormData();
+	
+	  Object.keys(obj).forEach(function (property) {
+	    if (obj.hasOwnProperty(property)) {
+	      var formKey = void 0;
+	
+	      if (namespace) {
+	        formKey = namespace + '[' + property + ']';
+	      } else {
+	        formKey = property;
+	      }
+	
+	      // if the property is an object, but not a File,
+	      // use recursivity.
+	      if (_typeof(obj[property]) === 'object' && !(obj[property] instanceof File)) {
+	        convertObjectToFormData(obj[property], fd, property);
+	      } else {
+	        // if it's a string or a File object
+	        fd.append(formKey, obj[property]);
+	      }
+	    }
+	  });
+	
+	  return fd;
+	}
+	
+	var core = exports.core = {
+	  search: function search(word) {
+	    return fetch(getEndPointForSearch(word), {
+	      credentials: 'include'
+	    }).then(function (data) {
+	      return data.text();
+	    }).then(function (data) {
+	      var ret = /dict.innerHTML='(.*)'/.exec(data);
+	      if (ret && ret[1]) {
+	        return ret[1].replace(/\\"/g, '"');
+	      }
+	      throw new Error('\u672A\u627E\u5230 ' + word);
+	    });
+	  },
+	  addToMyNote: function addToMyNote(_ref) {
+	    var word = _ref.word,
+	        notebookName = _ref.notebookName,
+	        notebookId = _ref.notebookId;
+	
+	    return this.getCurrentUserInfo().then(function (user) {
+	      if (user) {
+	        return fetch(getEndPointForAddWordToNotebook(), {
+	          credentials: 'include',
+	          method: 'POST',
+	          body: convertObjectToFormData({
+	            u: user.id,
+	            b: [],
+	            w: JSON.stringify([{
+	              ID: 1,
+	              w: word,
+	              p: notebookName,
+	              i: notebookId
+	            }])
+	          })
+	        }).then(function (ret) {
+	          return ret.json();
+	        }).then(function (ret) {
+	          if (ret[0] && !ret[0].errno) {
+	            return ret[0];
+	          }
+	          throw ret;
+	        });
+	      }
+	      throw new Error('need to login first');
+	    });
+	  },
+	  ifLogin: function ifLogin(next) {
+	    return this.getCurrentUserInfo(function (user) {
+	      return next(!!user);
+	    });
+	  },
+	  getSettings: function getSettings() {
+	    return new Promise(function (resolve) {
+	      chrome.storage.local.get(['setting_huaci', 'setting_auto_pronounce', 'setting_auto_add_to_my_note'], resolve);
+	    });
+	  },
+	  getNotebookList: function getNotebookList() {
+	    return this.getCurrentUserInfo().then(function (user) {
+	      if (user) {
+	        if (user.books) {
+	          return Promise.resolve(user.books);
+	        }
+	        return fetch(getEndPointForNotebookList(), {
+	          credentials: 'include',
+	          method: 'POST',
+	          body: convertObjectToFormData({
+	            u: user.id
+	          })
+	        }).then(function (res) {
+	          return res.json();
+	        }).then(function (res) {
+	          USER_INFO.books = res.books;
+	          return res.books;
+	        });
+	      }
+	      return [];
+	    });
+	  },
+	  getCurrentUserInfo: function getCurrentUserInfo() {
+	    var _this = this;
+	
+	    if (typeof USER_INFO === 'undefined') {
+	      var _ret = function () {
+	        var user = null;
+	        return {
+	          v: _this.getAllCookies().then(function (cookies) {
+	            cookies.forEach(function (cookie) {
+	              if (cookie.name === '_ustat') {
+	                var userInfo = {};
+	                try {
+	                  userInfo = JSON.parse(decodeURIComponent(cookie.value));
+	                } catch (e) {
+	                  userInfo = {};
+	                }
+	
+	                // 是否存在用户名，是则任务登陆了
+	                if (userInfo.e) {
+	                  user = {
+	                    id: userInfo.i,
+	                    email: userInfo.e
+	                  };
+	                }
+	              }
+	            });
+	
+	            USER_INFO = user;
+	            return user;
+	          })
+	        };
+	      }();
+	
+	      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	    }
+	
+	    return Promise.resolve(USER_INFO);
+	  },
+	  setSettings: function setSettings(obj) {
+	    return new Promise(function (resolve) {
+	      chrome.storage.local.set(obj, resolve);
+	    });
+	  },
+	  getAllCookies: function getAllCookies() {
+	    return new Promise(function (resolve) {
+	      chrome.cookies.getAll({ domain: 'iciba.com' }, resolve);
+	    });
+	  }
+	};
+	
+	var iciba = exports.iciba = {};
+	
+	Object.keys(core).forEach(function (key) {
+	  iciba[key] = function () {
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+	
+	    return new Promise(function (resolve) {
+	      chrome.runtime.sendMessage({
+	        target: MESSAGE_TARGET,
+	        type: key,
+	        data: [].concat(args)
+	      }, function (ret) {
+	        console.log('sendmessage ret', ret);
+	        resolve(ret);
+	      });
+	    });
+	  };
+	});
 
 /***/ },
 /* 3 */
