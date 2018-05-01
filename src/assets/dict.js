@@ -256,6 +256,7 @@
             this.domResult.find('.icIBahyI-eg a').each(function( index, a ){
                 a = $( a );
                 var mp3 = /(http\:.*\.mp3)/.exec(a.attr( 'onclick' ))[0];
+                mp3 = mp3.replace('http:', 'https:');
                 a.attr( 'data-audio-url', mp3 );
                 a.removeAttr( 'onclick' );
                 a.addClass( 'fa fa-volume-up iciba-extension-pronounce' );
